@@ -1,2 +1,4 @@
 # ecommerce_backend1
-this the back end for my First eccomerce  Prodection ready, Devloped uing .Net Core 
+## this is the back end for my First Prodection ready eccomerce app , Devloped uing .Net Core ,
+## and Providing restful APIs 
+
