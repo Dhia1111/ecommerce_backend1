@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\Quick Tech\\Documents\\Visual Studio 2022\\Templates\\ProjectTemplates\\C#\\ecommerce_backend1\\Ecommerce1\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F97A7303-B394-48C9-B4A6-085ED0C1CCFE}|Ecommerce1.csproj|c:\\users\\quick tech\\documents\\visual studio 2022\\templates\\projecttemplates\\c#\\ecommerce_backend1\\ecommerce1\\gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
-      "RelativeMoniker": "D:0:0:{F97A7303-B394-48C9-B4A6-085ED0C1CCFE}|Ecommerce1.csproj|solutionrelative:gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{F97A7303-B394-48C9-B4A6-085ED0C1CCFE}|Ecommerce1.csproj|c:\\users\\quick tech\\documents\\visual studio 2022\\templates\\projecttemplates\\c#\\ecommerce_backend1\\ecommerce1\\gitignore||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{F97A7303-B394-48C9-B4A6-085ED0C1CCFE}|Ecommerce1.csproj|solutionrelative:gitignore||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F97A7303-B394-48C9-B4A6-085ED0C1CCFE}|Ecommerce1.csproj|c:\\users\\quick tech\\documents\\visual studio 2022\\templates\\projecttemplates\\c#\\ecommerce_backend1\\ecommerce1\\gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{F97A7303-B394-48C9-B4A6-085ED0C1CCFE}|Ecommerce1.csproj|solutionrelative:gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,7 +18,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -34,7 +34,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "gitignore",
               "DocumentMoniker": "C:\\Users\\Quick Tech\\Documents\\Visual Studio 2022\\Templates\\ProjectTemplates\\C#\\ecommerce_backend1\\Ecommerce1\\gitignore",
               "RelativeDocumentMoniker": "gitignore",
@@ -47,7 +47,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "gitignore",
               "DocumentMoniker": "C:\\Users\\Quick Tech\\Documents\\Visual Studio 2022\\Templates\\ProjectTemplates\\C#\\ecommerce_backend1\\Ecommerce1\\gitignore",
               "RelativeDocumentMoniker": "gitignore",
@@ -55,7 +55,8 @@
               "RelativeToolTip": "gitignore",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-02-17T22:01:07.094Z"
+              "WhenOpened": "2025-02-17T22:01:07.094Z",
+              "EditorCaption": ""
             }
           ]
         }
