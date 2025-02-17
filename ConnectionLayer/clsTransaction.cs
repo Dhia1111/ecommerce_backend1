@@ -4,36 +4,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+public class DTOTransaction
+{
+   public enum enState { Pending,Failed,Succeeded}
+
+    public int ID { get; set; }
+
+    public string PaymentMethodID { get; set; }
+
+
+    public enState State { get; set; }
+
+    public decimal TotolePrice { get; set; }
+
+    public int CustomerID { get; set; }
+
+    public string TransactionGUID { get; set; }
+
+    public DTOTransaction(int ID, string PaymentMethodID, enState State, decimal TotolePrice, int CustomerID, string TransactionGUID)
+    {
+        this.ID = ID;
+        this.PaymentMethodID = PaymentMethodID;
+        this.State = State;
+        this.TotolePrice = TotolePrice;
+        this.CustomerID = CustomerID;
+        this.TransactionGUID = TransactionGUID;
+    }
+
+}
 
 namespace ConnectionLayer
 {
-    public class DTOTransaction { 
     
-   public int ID {  get; set; }
-
- public    string PaymentMethodID {  get; set; }
-
-
-       public byte State {  get; set; }
-        
-      public  decimal TotolePrice {  get; set; }
-
-     public   int CustomerID {  get; set; }
-
-     public string TransactionGUID {  get; set; }
-
-        public DTOTransaction(int ID,string PaymentMethodID,byte State ,decimal TotolePrice,int CustomerID, string TransactionGUID)
-        {
-            this.ID = ID;
-            this.PaymentMethodID = PaymentMethodID;
-            this.State = State;
-            this.TotolePrice = TotolePrice;
-            this.CustomerID = CustomerID;
-            this.TransactionGUID = TransactionGUID;
-        }
-       
-    }
-
     public static class clsTransaction
 
     {
@@ -74,7 +76,7 @@ namespace ConnectionLayer
 
                                     Transaction.ID = TransactionID;
                                     Transaction.PaymentMethodID = Reader["TransactionPaymentMethodID"].ToString();
-                                    Transaction.State = State;
+                                    Transaction.State = (DTOTransaction.enState)State;
                                     Transaction.TotolePrice = TotolePrice;
                                     Transaction.CustomerID =CustomerID ;
                                     Transaction.TransactionGUID = Reader["TransactionGUID"].ToString();
@@ -110,7 +112,7 @@ namespace ConnectionLayer
 
 
         }
-        public static async Task<List<DTOTransaction>?> Get()
+        public static async Task<List<DTOTransaction>?> GetAll()
         {
             string qery = "select*From Transactions";
 
@@ -138,7 +140,7 @@ namespace ConnectionLayer
                                       Reader["TransactionGUID"] == null))
 
                                 {
-                                    Transaction.Add(new DTOTransaction(TransactionID, Reader["TransactionPaymentMethodID"].ToString(), State,TotolePrice ,CustomerID, Reader["TransaactionGUID"].ToString()));
+                                    Transaction.Add(new DTOTransaction(TransactionID, Reader["TransactionPaymentMethodID"].ToString(), (DTOTransaction.enState)State,TotolePrice ,CustomerID, Reader["TransaactionGUID"].ToString()));
 
                                 }
 
@@ -192,7 +194,7 @@ namespace ConnectionLayer
                         command.Parameters.AddWithValue("@TransactionState", Transaction.State);
                         command.Parameters.AddWithValue("@TransactionTotolePrice", Transaction.TotolePrice);
                         command.Parameters.AddWithValue("@TransactionUserID", Transaction.CustomerID);
-                        command.Parameters.AddWithValue("@TransactionGUID", Transaction.TransactionGUID);
+                        command.Parameters.AddWithValue("@TransactionGUID", Guid.Parse(Transaction.TransactionGUID));
                       
 
 
@@ -260,7 +262,7 @@ where TransactionD=@TransactionID";
                         command.Parameters.AddWithValue("@TransactionUserID", Transaction.CustomerID);
                         command.Parameters.AddWithValue("@TransactionState", Transaction.State);
                         command.Parameters.AddWithValue("@TransactionTotolePrice", Transaction.TotolePrice);
-                        command.Parameters.AddWithValue("@TransactionGUID", Transaction.TransactionGUID);
+                        command.Parameters.AddWithValue("@TransactionGUID", Guid.Parse(Transaction.TransactionGUID));
                         command.Parameters.AddWithValue("@TransactionPaymentMehodID", Transaction.PaymentMethodID);
                        
 

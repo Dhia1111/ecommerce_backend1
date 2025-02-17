@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ConnectionLayer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ebece8054a91ee86a6721d3e2aa60456242a51d6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b0bfe37d25b51ccdb136aeec6b5a308c6c289847")]
 [assembly: System.Reflection.AssemblyProductAttribute("ConnectionLayer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ConnectionLayer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

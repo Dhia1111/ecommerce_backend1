@@ -24,11 +24,11 @@ using System.Threading.Tasks;
 namespace ConnectionLayer
 {
     public static class clsIncludedProducts
-    
-        
+
+
     {
         public static async Task<DTOIncludedProducts?> Find(int ID)
-           {
+        {
 
 
             string qery = "select top 1* From IncludedProducts where IncludedProductID=@IncludedProductID";
@@ -58,14 +58,14 @@ namespace ConnectionLayer
 
                                 if (!(int.TryParse(Reader["IncludedProductID"].ToString(), out int IncludedProductID) ||
                                     int.TryParse(Reader["TransactionID"].ToString(), out int TransactionID) ||
-                                    int.TryParse(Reader["ProductID"].ToString(), out int ProductID) ))
-                                 
+                                    int.TryParse(Reader["ProductID"].ToString(), out int ProductID)))
+
                                 {
 
                                     IncludedProduct.TransactionID = TransactionID;
                                     IncludedProduct.ProductID = ProductID;
                                     IncludedProduct.ID = IncludedProductID;
-                                 
+
 
 
                                     return IncludedProduct;
@@ -123,7 +123,7 @@ namespace ConnectionLayer
                                  int.TryParse(Reader["TransactionID"].ToString(), out int TransactionID) ||
                                  int.TryParse(Reader["ProductID"].ToString(), out int ProductID)))
                                 {
-                                    Users.Add(new DTOIncludedProducts(IncludedProducts,TransactionID,ProductID));
+                                    Users.Add(new DTOIncludedProducts(IncludedProducts, TransactionID, ProductID));
                                 }
                                 else
                                 {
@@ -174,15 +174,15 @@ namespace ConnectionLayer
                     using (SqlCommand command = new SqlCommand(qery, connection))
                     {
 
-                        command.Parameters.AddWithValue("@TransactionID",IncludedProducts.TransactionID);
+                        command.Parameters.AddWithValue("@TransactionID", IncludedProducts.TransactionID);
                         command.Parameters.AddWithValue("@ProductID", IncludedProducts.ProductID);
-                       
+
 
 
                         object? objPersonID = await command.ExecuteScalarAsync();
 
-                          if (objPersonID != null)
-                          {
+                        if (objPersonID != null)
+                        {
 
                             if (int.TryParse(objPersonID.ToString(), out int ID))
                             {
@@ -238,7 +238,7 @@ namespace ConnectionLayer
                         command.Parameters.AddWithValue("@IncludedProductID", IncludedProduct.ID);
                         command.Parameters.AddWithValue("@TransactionID", IncludedProduct.TransactionID);
                         command.Parameters.AddWithValue("@ProductID", IncludedProduct.ProductID);
-                      
+
 
                         int NumberRowAffected = await command.ExecuteNonQueryAsync();
 
@@ -320,5 +320,6 @@ namespace ConnectionLayer
 
 
     }
+}
 
 

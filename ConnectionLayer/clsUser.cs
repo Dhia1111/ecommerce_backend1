@@ -7,11 +7,15 @@ using System.Threading.Tasks;
 
 public class DTOUser
 {
+    public enum enAtherizations { AddUser = 2, UpdateUser = 4, DeleteHisAccount = 16, DeleteUsers = 8, MakeTransaction = 1 }
+    public enum enRole { Admine = 1, Customer = 2, User = 3 }
+
+
     public int UserID { get; set; }
 
     public int PersonID { get; set; }
 
-    public byte UserRole { get; set; }
+    public enRole UserRole { get; set; }
 
     public byte UserAtherization { get; set; }
 
@@ -22,7 +26,7 @@ public class DTOUser
     public string CreatedAt {  get; set; }
 
 
-    public DTOUser(int UserID, int PersonID, byte UserRole, byte UserAtherization, string UserName, string UserPassword, string CreatedAt) {
+    public DTOUser(int UserID, int PersonID, enRole UserRole, byte UserAtherization, string UserName, string UserPassword, string CreatedAt) {
         this.UserID = UserID;
         this.PersonID = PersonID;
         this.UserRole = UserRole;
@@ -80,7 +84,7 @@ namespace ConnectionLayer
 
                                     User.UserID = UserID;
                                     User.PersonID = PersonID;
-                                    User.UserRole = UserRole;
+                                    User.UserRole =(DTOUser.enRole) UserRole;
                                     User.UserAtherization = UserAtherization;
                                     User.UserName = Reader["UserName"].ToString();
                                     User.UserPassword = Reader["UserPassWord"].ToString();
@@ -146,7 +150,7 @@ namespace ConnectionLayer
                                  Reader["UserPassWord"] == null ||
                                  Reader["CreateAT"] == null))
                                 {
-                                 Users.Add(new DTOUser(UserID, PersonID, UserRole, UserAtherization, Reader["UserName"].ToString(), Reader["UserPassWord"].ToString(), Reader["CreatedAt"].ToString()));
+                                 Users.Add(new DTOUser(UserID, PersonID, (DTOUser.enRole)UserRole, UserAtherization, Reader["UserName"].ToString(), Reader["UserPassWord"].ToString(), Reader["CreatedAt"].ToString()));
                                 }
                                 else
                                 {

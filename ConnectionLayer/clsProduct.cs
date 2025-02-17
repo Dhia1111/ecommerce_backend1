@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 public class DTOProduct { 
 
     public int ID { get; set; }
-    public string Category { get; set; }
+    public int CategoryID { get; set; }
 
     public string Name { get; set; }
 
@@ -16,10 +16,10 @@ public class DTOProduct {
    
     public string Imagepath { get; set; }
 
-    public DTOProduct(int ID,string Category,string Name,decimal Price,string Imagepath)
+    public DTOProduct(int ID,int CategoryID,string Name,decimal Price,string Imagepath)
     {
         this.ID = ID;
-        this.Category = Category;
+        this.CategoryID = CategoryID;
         this.Name = Name;
         this.Price = Price;
         this.Imagepath = Imagepath;
@@ -58,7 +58,7 @@ namespace ConnectionLayer
                             {
 
 
-                                DTOProduct Product = new DTOProduct(-1, "", "", 0, "");
+                                DTOProduct Product = new DTOProduct(-1, -1, "", 0, "");
 
 
                                 if (!(
@@ -66,7 +66,7 @@ namespace ConnectionLayer
                                     Reader["ProductName"] == null ||
                                     Reader["ProductCatigory"] == null ||
                                    decimal.TryParse(Reader["ProductPrice"].ToString(),out decimal Price) ||
-                                    Reader["ProductImagePath"] == null
+                                    Reader["ProductImagePath"] == null|| int.TryParse(Reader["ProductCategory"].ToString(),out int CatygoryID)
 
                                     )
                                     )
@@ -75,7 +75,7 @@ namespace ConnectionLayer
                                     Product.ID = ProductID;
                                     Product.Price = Price;
                                     Product.Name = Reader["ProductName"].ToString();
-                                    Product.Category = Reader["ProductCategory"].ToString();
+                                    Product.CategoryID = CatygoryID;
                                     Product.Imagepath = Reader["ProductImagePath"].ToString();
                                  
                                     return Product;
@@ -112,7 +112,7 @@ namespace ConnectionLayer
 
 
 
-        public static async Task<List<DTOProduct>?> Get()
+        public static async Task<List<DTOProduct>?> GetAll()
         {
             string qery = "select*from Products";
 
@@ -137,16 +137,17 @@ namespace ConnectionLayer
                              Reader["ProductName"] == null ||
                              Reader["ProductCatigory"] == null ||
                             decimal.TryParse(Reader["ProductPrice"].ToString(), out decimal Price) ||
-                             Reader["ProductImagePath"] == null
+                             Reader["ProductImagePath"] == null||
+                             int.TryParse(Reader["ProductCategory"].ToString(),out int CategoryID)
 
                              )
                              )
                                 {
-                                    DTOProduct Product = new DTOProduct(-1, "", "", 0, "");
+                                    DTOProduct Product = new DTOProduct(-1, -1, "", 0, "");
                                     Product.ID = ProductID;
                                     Product.Price = Price;
                                     Product.Name = Reader["ProductName"].ToString();
-                                    Product.Category = Reader["ProductCategory"].ToString();
+                                    Product.CategoryID = CategoryID;
                                     Product.Imagepath = Reader["ProductImagePath"].ToString();
 
                                     Products.Add(Product);
@@ -200,7 +201,7 @@ namespace ConnectionLayer
                         command.Parameters.AddWithValue("@ProductPrice", Product.Price);
                         command.Parameters.AddWithValue("@ProductImagePath", Product.Imagepath);
                         command.Parameters.AddWithValue("@ProductName", Product.Name);
-                        command.Parameters.AddWithValue("@ProductCatigory", Product.Category);
+                        command.Parameters.AddWithValue("@ProductCatigory", Product.CategoryID);
                       
 
                         object? objPersonID = await command.ExecuteScalarAsync();
@@ -266,7 +267,7 @@ namespace ConnectionLayer
                         command.Parameters.AddWithValue("@ProductPrice", Product.Price);
                         command.Parameters.AddWithValue("@ProductImagePath", Product.Imagepath);
                         command.Parameters.AddWithValue("@ProductName", Product.Name);
-                        command.Parameters.AddWithValue("@ProductCatigory", Product.Category);
+                        command.Parameters.AddWithValue("@ProductCatigory", Product.CategoryID);
                         command.Parameters.AddWithValue("@ProductID", Product.ID);
                    
 
