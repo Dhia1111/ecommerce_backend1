@@ -9,11 +9,11 @@ using System.Net;
 
 
 
-
+ 
 var builder = WebApplication.CreateBuilder(args);
 
 string SecretKey = builder.Configuration["AppSettings:JWT_SECRET"];
-
+if (SecretKey == null) throw new Exception("Could not Create services due to Invaliad information ");
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
@@ -25,14 +25,20 @@ builder.Services.AddAuthentication((option) =>
     option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     option.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-}).AddCookie((options) =>{
+}).
+AddCookie((options) =>{
     options.Cookie.Name = "Authentication";  // Set cookie name
     options.Cookie.HttpOnly = true;  // Cookie is HTTP only (can't be accessed by JavaScript)
     options.SlidingExpiration = true;  // Allow cookie expiration on every request
     options.ExpireTimeSpan = TimeSpan.FromMinutes(60);  // Set the expiration time
-    options.Cookie.SameSite = SameSiteMode.Strict;
-}).AddJwtBearer(options =>
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+   
+
+}).
+AddJwtBearer(options =>
 {
+    
     options.RequireHttpsMetadata = false; // Set true in production
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
@@ -48,11 +54,12 @@ builder.Services.AddAuthentication((option) =>
 });
 
 
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")  
+        policy.WithOrigins("https://localhost:3000")  
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -70,12 +77,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors("AllowReactApp");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseCors("AllowReactApp");
 app.MapControllers();
 
 app.Run();

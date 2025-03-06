@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+using System.ComponentModel.DataAnnotations;
 
 
 
@@ -18,6 +21,7 @@ public class DTOPerson
 
     public string LastName { get; set; }
 
+    [EmailAddress]
     public string Email { get; set; }
 
     public string Phone { get; set; }
@@ -44,7 +48,20 @@ namespace ConnectionLayer
 {
   static  class  clsConnectionGenral
     {
-       public static string ConnectionString ="" ;
+
+         public static string ConnectionString  = "";
+        private static IConfiguration _configuration;
+        static clsConnectionGenral()
+        {
+            var builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
+
+            _configuration = builder.Build();
+
+            var st = _configuration["ConnectionSetting:Defualt"];
+           if (!string.IsNullOrEmpty(st)) ConnectionString =st ;
+        }
     }
     public static class clsPerson
     {
@@ -77,8 +94,8 @@ namespace ConnectionLayer
                                 DTOPerson Person = new DTOPerson(-1, "", "", "", "", "", "", "");
 
                                
-                                if(!(int.TryParse(Reader["PersonID"].ToString(),out int PersonID) || Reader["FirstName"] == null || Reader["LastName"] == null || Reader["Email"] == null || Reader["Phone"] == null || Reader["Country"] == null
-                                    || Reader["City"] == null || Reader["PostCode"] == null))
+                                if((int.TryParse(Reader["PersonID"].ToString(),out int PersonID) && Reader["FirstName"] != null && Reader["LastName"] != null || Reader["Email"] != null || Reader["Phone"] != null || Reader["Country"] != null
+                                    && Reader["City"] != null && Reader["PostCode"] != null))
                                 {
 
                                     Person.PersonID = PersonID;

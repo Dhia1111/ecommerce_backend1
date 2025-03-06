@@ -13,8 +13,8 @@ public class DTOCatygory {
     public string Name { get; set; }
     public DTOCatygory(int ID, string Name) {
 
-        ID = ID;
-        Name = Name;
+        this.ID = ID;
+        this.Name = Name;
     }
 }
 
@@ -29,7 +29,7 @@ namespace ConnectionLayer
         {
 
 
-            string qery = "select top 1* From Catygories where CatygoryID=@CatygoryID";
+            string qery = "select top 1* From Catigories where CatygoryID=@CatygoryID";
 
 
             try
@@ -98,7 +98,7 @@ namespace ConnectionLayer
         public static async Task<DTOCatygory?> Find(string Name)
         {
 
-            string qery = "select top 1* From Catygories where CatygoryName=@CatygoryName";
+            string qery = "select top 1* From Catigories where CatygoryName=@CatygoryName";
 
 
             try
@@ -169,7 +169,7 @@ namespace ConnectionLayer
 
         public static async Task<List<DTOCatygory>?> GetAll()
         {
-            string qery = "Select*From Catygories ";
+            string qery = "Select*From Catigories ";
 
             List<DTOCatygory> Catygories = new List<DTOCatygory>();
 
@@ -227,7 +227,7 @@ namespace ConnectionLayer
         public static async Task<int> Add(DTOCatygory dTOCatygory)
         {
 
-            string qery = "insert into Catygories(CatygoryName)" +
+            string qery = "insert into Catigories(CatygoryName)" +
                 "values(@CatygoryName);Select SCOPE_IDENTITY()";
 
 
@@ -283,7 +283,7 @@ namespace ConnectionLayer
         public static async Task<bool> Update(DTOCatygory Catigory)
         {
 
-            string qery = @"Update Catygories set 
+            string qery = @"Update Catigories set 
                        
                CatygoryName=  @CatygoryName,
               
@@ -336,7 +336,7 @@ namespace ConnectionLayer
         public static async Task<bool> Delete(int ID)
         {
 
-            string qery = @"Delete from  IncludedProducts  where IncludedProductID=@IncludedProductID";
+            string qery = @"Delete from  Catigories  where CatigoryID=@CatigoryID";
 
 
             try
@@ -348,7 +348,7 @@ namespace ConnectionLayer
                     using (SqlCommand command = new SqlCommand(qery, connection))
                     {
 
-                        command.Parameters.AddWithValue("@IncludedProductID", ID);
+                        command.Parameters.AddWithValue("@CatigoryID", ID);
 
 
                         int NumberRowAffected = await command.ExecuteNonQueryAsync();

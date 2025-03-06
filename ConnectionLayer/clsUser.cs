@@ -25,15 +25,18 @@ public class DTOUser
 
     public string CreatedAt {  get; set; }
 
+    public DTOPerson Person { get; set; }
 
-    public DTOUser(int UserID, int PersonID, enRole UserRole, byte UserAtherization, string UserName, string UserPassword, string CreatedAt) {
+    public DTOUser(int UserID,int PersonID ,enRole UserRole, byte UserAtherization, string UserName, string UserPassword, string CreatedAt) {
         this.UserID = UserID;
         this.PersonID = PersonID;
+       
         this.UserRole = UserRole;
         this.UserName = UserName;
         this.UserPassword = UserPassword;
         this.UserAtherization = UserAtherization;
         this.CreatedAt = CreatedAt;
+        this.Person = new DTOPerson(-1, "", "", "", "", "", "", "");
     }
 
 
@@ -73,18 +76,174 @@ namespace ConnectionLayer
                                 DTOUser User = new DTOUser(-1,-1, 0, 0, "", "", "");
 
 
-                                if (!(int.TryParse(Reader["UserID"].ToString(), out int UserID) ||
-                                    int.TryParse(Reader["PersonID"].ToString(), out int PersonID) ||
-                                    byte.TryParse(Reader["UserRole"].ToString(), out byte UserRole) ||
-                                     byte.TryParse(Reader["PersonID"].ToString(), out byte UserAtherization) ||
-                                    Reader["UserName"] == null ||
-                                    Reader["UserPassWord"] == null ||
-                                    Reader["CreateAT"] == null  ))
+                                if ((int.TryParse(Reader["UserID"].ToString(), out int UserID) &&
+                                    int.TryParse(Reader["PersonID"].ToString(), out int PersonID) &&
+                                    byte.TryParse(Reader["UserRole"].ToString(), out byte UserRole) &&
+                                     byte.TryParse(Reader["PersonID"].ToString(), out byte UserAtherization) &&
+                                    Reader["UserName"] != null &&
+                                    Reader["UserPassWord"] != null &&
+                                    Reader["CreateAT"] != null  ))
                                 {
 
                                     User.UserID = UserID;
                                     User.PersonID = PersonID;
                                     User.UserRole =(DTOUser.enRole) UserRole;
+                                    User.UserAtherization = UserAtherization;
+                                    User.UserName = Reader["UserName"].ToString();
+                                    User.UserPassword = Reader["UserPassWord"].ToString();
+                                    User.CreatedAt = Reader["CreateAt"].ToString();
+
+
+                                    return User;
+                                }
+
+
+
+
+
+
+                            }
+
+                        }
+
+
+                    }
+
+                }
+            }
+
+
+            catch
+            {
+
+                return null;
+            }
+
+
+            return null;
+
+
+
+        }
+
+        public static async Task<DTOUser?> FindbyPersonID(int ID)
+        {
+
+
+            string qery = "select top 1* From Users where PersonID=@PersonID";
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsConnectionGenral.ConnectionString))
+                {
+                    connection.Open();
+
+                    using (SqlCommand command = new SqlCommand(qery, connection))
+                    {
+
+                        command.Parameters.AddWithValue("@PersonID", ID);
+
+
+                        using (SqlDataReader Reader = await command.ExecuteReaderAsync())
+                        {
+
+                            if (Reader.Read())
+                            {
+
+
+                                DTOUser User = new DTOUser(-1, -1, 0, 0, "", "", "");
+
+
+                                if ((int.TryParse(Reader["UserID"].ToString(), out int UserID) &&
+                                    int.TryParse(Reader["PersonID"].ToString(), out int PersonID) &&
+                                    byte.TryParse(Reader["UserRole"].ToString(), out byte UserRole) &&
+                                     byte.TryParse(Reader["PersonID"].ToString(), out byte UserAtherization) &&
+                                    Reader["UserName"] != null &&
+                                    Reader["UserPassWord"] != null &&
+                                    Reader["CreateAT"] != null))
+                                {
+
+                                    User.UserID = UserID;
+                                    User.PersonID = PersonID;
+                                    User.UserRole = (DTOUser.enRole)UserRole;
+                                    User.UserAtherization = UserAtherization;
+                                    User.UserName = Reader["UserName"].ToString();
+                                    User.UserPassword = Reader["UserPassWord"].ToString();
+                                    User.CreatedAt = Reader["CreateAt"].ToString();
+
+
+                                    return User;
+                                }
+
+
+
+
+
+
+                            }
+
+                        }
+
+
+                    }
+
+                }
+            }
+
+
+            catch
+            {
+
+                return null;
+            }
+
+
+            return null;
+
+
+
+        }
+
+        public static async Task<DTOUser?> Find(string UserName)
+        {
+
+
+            string qery = "select top 1* From Users where UserName=@UserName ";
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsConnectionGenral.ConnectionString))
+                {
+                    connection.Open();
+
+                    using (SqlCommand command = new SqlCommand(qery, connection))
+                    {
+
+                        command.Parameters.AddWithValue("@UserName", UserName);
+
+
+                        using (SqlDataReader Reader = await command.ExecuteReaderAsync())
+                        {
+
+                            if (Reader.Read())
+                            {
+
+
+                                DTOUser User = new DTOUser(-1, -1, 0, 0, "", "", "");
+
+
+                                if ((int.TryParse(Reader["UserID"].ToString(), out int UserID) &&
+                                    int.TryParse(Reader["PersonID"].ToString(), out int PersonID) &&
+                                    byte.TryParse(Reader["UserRole"].ToString(), out byte UserRole) &&
+                                     byte.TryParse(Reader["UserAtherization"].ToString(), out byte UserAtherization) &&
+                                    Reader["UserName"] != null &&
+                                    Reader["UserPassWord"] != null &&
+                                    Reader["CreateAT"] != null))
+                                {
+
+                                    User.UserID = UserID;
+                                    User.PersonID = PersonID;
+                                    User.UserRole = (DTOUser.enRole)UserRole;
                                     User.UserAtherization = UserAtherization;
                                     User.UserName = Reader["UserName"].ToString();
                                     User.UserPassword = Reader["UserPassWord"].ToString();
