@@ -8,21 +8,38 @@ using System.Threading.Tasks;
 public class DTOProduct { 
 
     public int ID { get; set; }
-    public int CategoryID { get; set; }
 
     public string Name { get; set; }
 
     public decimal Price { get; set; }
-   
-    public string Imagepath { get; set; }
 
-    public DTOProduct(int ID,int CategoryID,string Name,decimal Price,string Imagepath)
+
+    public string? ImageName { get; set; }
+    public string? ImageUrl { get; set; }
+
+    public List<DTOCatygory.enCatigories> Catigories { get; set; }
+    public DTOProduct(int ID, string Name, decimal Price, string Imagepath, string ImageUrl = "", List<DTOCatygory.enCatigories> catigories=null )
     {
         this.ID = ID;
-        this.CategoryID = CategoryID;
         this.Name = Name;
         this.Price = Price;
-        this.Imagepath = Imagepath;
+        this.ImageName = Imagepath;
+        this.ImageUrl =ImageUrl;
+        {
+            this.Catigories = catigories;
+        }
+    }
+
+    public DTOProduct()
+    {
+
+        this.ID = -1;
+        this.Name = "";
+        this.Price = 0;
+        this.ImageName = "";
+        this.ImageUrl = "";
+        this.Catigories =new List<DTOCatygory.enCatigories>(10);
+
 
     }
 }
@@ -58,25 +75,23 @@ namespace ConnectionLayer
                             {
 
 
-                                DTOProduct Product = new DTOProduct(-1, -1, "", 0, "");
+                                DTOProduct Product = new DTOProduct(-1,  "", 0, "");
 
 
-                                if (!(
-                                    int.TryParse(Reader["ProductID"].ToString(), out int ProductID) || 
-                                    Reader["ProductName"] == null ||
-                                    Reader["ProductCatigory"] == null ||
-                                   decimal.TryParse(Reader["ProductPrice"].ToString(),out decimal Price) ||
-                                    Reader["ProductImagePath"] == null|| int.TryParse(Reader["ProductCategory"].ToString(),out int CatygoryID)
+                                if (
+                                    int.TryParse(Reader["ProductID"].ToString(), out int ProductID) &&
+                                    Reader["ProductName"] != null &&
+                                   decimal.TryParse(Reader["ProductPrice"].ToString(),out decimal Price) &&
+                                    Reader["ProductImagePath"] != null 
 
-                                    )
+                                    
                                     )
                                 {
 
                                     Product.ID = ProductID;
                                     Product.Price = Price;
                                     Product.Name = Reader["ProductName"].ToString();
-                                    Product.CategoryID = CatygoryID;
-                                    Product.Imagepath = Reader["ProductImagePath"].ToString();
+                                    Product.ImageName = Reader["ProductImagePath"].ToString();
                                  
                                     return Product;
                                 }
@@ -132,23 +147,20 @@ namespace ConnectionLayer
                             while (Reader.Read())
                             {
 
-                                if (!(
-                             int.TryParse(Reader["ProductID"].ToString(), out int ProductID) ||
-                             Reader["ProductName"] == null ||
-                             Reader["ProductCatigory"] == null ||
-                            decimal.TryParse(Reader["ProductPrice"].ToString(), out decimal Price) ||
-                             Reader["ProductImagePath"] == null||
-                             int.TryParse(Reader["ProductCategory"].ToString(),out int CategoryID)
-
+                                if ((
+                             int.TryParse(Reader["ProductID"].ToString(), out int ProductID) &&
+                             Reader["ProductName"] != null &&
+                            decimal.TryParse(Reader["ProductPrice"].ToString(), out decimal Price) &&
+                             Reader["ProductImagePath"] != null
+ 
                              )
                              )
                                 {
-                                    DTOProduct Product = new DTOProduct(-1, -1, "", 0, "");
+                                    DTOProduct Product = new DTOProduct(-1, "", 0, "");
                                     Product.ID = ProductID;
                                     Product.Price = Price;
                                     Product.Name = Reader["ProductName"].ToString();
-                                    Product.CategoryID = CategoryID;
-                                    Product.Imagepath = Reader["ProductImagePath"].ToString();
+                                    Product.ImageName = Reader["ProductImagePath"].ToString();
 
                                     Products.Add(Product);
                                  }
@@ -181,12 +193,80 @@ namespace ConnectionLayer
             return Products;
         }
 
+        public static async Task<List<DTOProduct>?> GetAllForCatigory(DTOCatygory.enCatigories Catigory)
+        {
+            string qery = @"select * from Products join CatigoriesManager on CatigoriesManager.ProductID=Products.ProductID where CatigoriesManager.CatigoryID=@CatigoryID";
+
+
+ 
+            List<DTOProduct> Products = new List<DTOProduct>();
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsConnectionGenral.ConnectionString))
+                {
+                    connection.Open();
+
+                    using (SqlCommand command = new SqlCommand(qery, connection))
+                    {
+                        command.Parameters.AddWithValue("@CatigoryID", (int)Catigory);
+                        using (SqlDataReader Reader = await command.ExecuteReaderAsync())
+                        {
+                            while (Reader.Read())
+                            {
+
+                                if ((
+                             int.TryParse(Reader["ProductID"].ToString(), out int ProductID) &&
+                             Reader["ProductName"] != null &&
+                            decimal.TryParse(Reader["ProductPrice"].ToString(), out decimal Price) &&
+                             Reader["ProductImagePath"] != null
+
+                             )
+                             )
+                                {
+                                    DTOProduct Product = new DTOProduct(-1, "", 0, "");
+                                    Product.ID = ProductID;
+                                    Product.Price = Price;
+                                    Product.Name = Reader["ProductName"].ToString();
+                                    Product.ImageName = Reader["ProductImagePath"].ToString();
+
+                                    Products.Add(Product);
+                                }
+
+                                else continue;
+
+
+
+
+                            }
+
+                        }
+
+
+                    }
+
+                }
+            }
+
+
+            catch
+            {
+
+                return null;
+            }
+
+
+
+
+            return Products;
+
+        }
 
         public static async Task<int> Add(DTOProduct Product)
         {
 
-            string qery = "insert into Products(ProductPrice,ProductImagePath ,ProductName,ProductCatigory)" +
-                "values(@ProductPrice,@ProductImagePath,@ProductName,@ProductCatigory);Select SCOPE_IDENTITY()";
+            string qery = @"insert into Products(ProductPrice,ProductImagePath ,ProductName)
+                values(@ProductPrice,@ProductImagePath,@ProductName);Select SCOPE_IDENTITY()";
 
 
             try
@@ -199,9 +279,8 @@ namespace ConnectionLayer
                     {
 
                         command.Parameters.AddWithValue("@ProductPrice", Product.Price);
-                        command.Parameters.AddWithValue("@ProductImagePath", Product.Imagepath);
+                        command.Parameters.AddWithValue("@ProductImagePath", Product.ImageName);
                         command.Parameters.AddWithValue("@ProductName", Product.Name);
-                        command.Parameters.AddWithValue("@ProductCatigory", Product.CategoryID);
                       
 
                         object? objPersonID = await command.ExecuteScalarAsync();
@@ -249,9 +328,8 @@ namespace ConnectionLayer
                        
               ProductPrice=     @ProductPrice,
               ProductImagePath= @ProductImagePath,
-              ProductName=      @ProductName,
-              ProductCatigory=  @ProductCatigory,
- 
+              ProductName=      @ProductName
+  
          where ProductID=@ProductID";
 
 
@@ -265,9 +343,8 @@ namespace ConnectionLayer
                     {
 
                         command.Parameters.AddWithValue("@ProductPrice", Product.Price);
-                        command.Parameters.AddWithValue("@ProductImagePath", Product.Imagepath);
+                        command.Parameters.AddWithValue("@ProductImagePath", Product.ImageName);
                         command.Parameters.AddWithValue("@ProductName", Product.Name);
-                        command.Parameters.AddWithValue("@ProductCatigory", Product.CategoryID);
                         command.Parameters.AddWithValue("@ProductID", Product.ID);
                    
 

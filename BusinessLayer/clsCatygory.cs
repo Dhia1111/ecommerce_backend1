@@ -9,16 +9,17 @@ namespace BusinessLayer
     public class clsCatygory
     {
         enum enMode { Add,Update}
+        DTOCatygory.enCatigories Catigory;
         enMode _Mode;
         int _ID;
         public int ID { get { return _ID; } }
         public string Name { get;set; }
 
         public DTOCatygory DTO { get { return new DTOCatygory(this.ID, this.Name); } }
-        public clsCatygory(string Name)
+        public clsCatygory(DTOCatygory.enCatigories Catigory)
         {
 
-            this.Name = Name;
+            this.Catigory = Catigory;
         }
          clsCatygory(int ID,string Name)
         {
@@ -30,12 +31,12 @@ namespace BusinessLayer
         async Task<bool> _Update()
         {
 
-            return await ConnectionLayer.clsCatygorie.Update(DTO);
+            return await ConnectionLayer.clsCatygory.Update(DTO);
 
         }
         async Task<bool>_Add()
         {
-            this._ID = await ConnectionLayer.clsCatygorie.Add(this.DTO);
+            this._ID = await ConnectionLayer.clsCatygory.Add(this.DTO);
             return _ID != -1;
         }
 
@@ -60,13 +61,13 @@ namespace BusinessLayer
 
         public static async Task<bool> Delete(int ID)
         {
-            return await ConnectionLayer.clsCatygorie.Delete(ID);
+            return await ConnectionLayer.clsCatygory.Delete(ID);
 
         }
 
         public static async Task<List<DTOCatygory>?> GetAll()
         {
-            return await ConnectionLayer.clsCatygorie.GetAll();
+            return await ConnectionLayer.clsCatygory.GetAll();
         }
 
     }

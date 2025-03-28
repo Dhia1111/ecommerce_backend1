@@ -59,6 +59,10 @@ namespace BusinessLayer
              
          }
 
+        public  async Task<List<DTOCartItem>?> Cart()
+        {
+            return await ConnectionLayer.clsCartItem.GetCart(this.UserID);  
+        }
         public static async Task<List<DTOUser>?> GetAll()
         {
             return await ConnectionLayer.clsUser.GetUsers();
@@ -174,7 +178,38 @@ namespace BusinessLayer
             return result;
         }
 
-        
+        public async Task<bool>AddToCart(DTOCartItem cartitem)
+        {
+            clsCartItem CartItem= new clsCartItem();
+
+            CartItem.ProductID = cartitem.ProductID;
+            CartItem.UserID= cartitem.UserID;
+            CartItem.NumberOfItems= cartitem.NumberOfItems;
+           
+            return await CartItem.Save();
+
+
+            
+        }
+
+        public async Task<bool> UpdateToCart(DTOCartItem cartitem)
+        {
+            clsCartItem CartItem = new clsCartItem();
+
+            CartItem.ProductID = cartitem.ProductID;
+            CartItem.UserID = cartitem.UserID;
+            CartItem.NumberOfItems = cartitem.NumberOfItems;
+
+            return await CartItem.Save();
+
+
+
+        }
+
+        public async Task<bool>DeleteProductFromUserCart(int ProductID)
+        {
+            return await clsCartItem.Delete(this.UserID, ProductID);
+        }
         public static async Task<bool>Delete(int ID)
         {
             return await ConnectionLayer.clsUser.Delete(ID);  

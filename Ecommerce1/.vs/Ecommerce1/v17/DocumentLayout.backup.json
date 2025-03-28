@@ -3,11 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\Quick Tech\\Documents\\Visual Studio 2022\\Templates\\ProjectTemplates\\C#\\ecommerce_backend1\\Ecommerce1\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F97A7303-B394-48C9-B4A6-085ED0C1CCFE}|Ecommerce1.csproj|c:\\users\\quick tech\\documents\\visual studio 2022\\templates\\projecttemplates\\c#\\ecommerce_backend1\\ecommerce1\\controllers\\valuescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F97A7303-B394-48C9-B4A6-085ED0C1CCFE}|Ecommerce1.csproj|solutionrelative:controllers\\valuescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9D3AF14E-89BD-43D7-BECB-1A2A828C2C44}|..\\ConnectionLayer\\ConnectionLayer.csproj|c:\\users\\quick tech\\documents\\visual studio 2022\\templates\\projecttemplates\\c#\\ecommerce_backend1\\connectionlayer\\clscatygorie.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{F97A7303-B394-48C9-B4A6-085ED0C1CCFE}|Ecommerce1.csproj|c:\\users\\quick tech\\documents\\visual studio 2022\\templates\\projecttemplates\\c#\\ecommerce_backend1\\ecommerce1\\controllers\\loginlogoutapis.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F97A7303-B394-48C9-B4A6-085ED0C1CCFE}|Ecommerce1.csproj|solutionrelative:controllers\\loginlogoutapis.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -17,7 +14,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -33,28 +30,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "clsCatygorie.cs",
-              "DocumentMoniker": "C:\\Users\\Quick Tech\\Documents\\Visual Studio 2022\\Templates\\ProjectTemplates\\C#\\ecommerce_backend1\\ConnectionLayer\\clsCatygorie.cs",
-              "RelativeDocumentMoniker": "..\\ConnectionLayer\\clsCatygorie.cs",
-              "ToolTip": "C:\\Users\\Quick Tech\\Documents\\Visual Studio 2022\\Templates\\ProjectTemplates\\C#\\ecommerce_backend1\\ConnectionLayer\\clsCatygorie.cs",
-              "RelativeToolTip": "..\\ConnectionLayer\\clsCatygorie.cs",
-              "ViewState": "AgIAABEAAAAAAAAAAAAgwIMBAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-05T22:33:57.698Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "ValuesController.cs",
-              "DocumentMoniker": "C:\\Users\\Quick Tech\\Documents\\Visual Studio 2022\\Templates\\ProjectTemplates\\C#\\ecommerce_backend1\\Ecommerce1\\Controllers\\ValuesController.cs",
-              "RelativeDocumentMoniker": "Controllers\\ValuesController.cs",
-              "ToolTip": "C:\\Users\\Quick Tech\\Documents\\Visual Studio 2022\\Templates\\ProjectTemplates\\C#\\ecommerce_backend1\\Ecommerce1\\Controllers\\ValuesController.cs",
-              "RelativeToolTip": "Controllers\\ValuesController.cs",
-              "ViewState": "AgIAAAIBAAAAAAAAAAAgwBUAAABJAAAAAAAAAA==",
+              "Title": "LogInLogOutAPIs.cs",
+              "DocumentMoniker": "C:\\Users\\Quick Tech\\Documents\\Visual Studio 2022\\Templates\\ProjectTemplates\\C#\\ecommerce_backend1\\Ecommerce1\\Controllers\\LogInLogOutAPIs.cs",
+              "RelativeDocumentMoniker": "Controllers\\LogInLogOutAPIs.cs",
+              "ToolTip": "C:\\Users\\Quick Tech\\Documents\\Visual Studio 2022\\Templates\\ProjectTemplates\\C#\\ecommerce_backend1\\Ecommerce1\\Controllers\\LogInLogOutAPIs.cs",
+              "RelativeToolTip": "Controllers\\LogInLogOutAPIs.cs",
+              "ViewState": "AgIAAEoBAAAAAAAAAAAswFgBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-01T12:10:02.578Z",
+              "WhenOpened": "2025-03-25T13:07:10.981Z",
               "EditorCaption": ""
             }
           ]

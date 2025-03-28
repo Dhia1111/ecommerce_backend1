@@ -4,16 +4,20 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 namespace Ecommerce1.Controllers;
+
+using BusinessLayer;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System.Net.Mail;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 
-[Route("api/Ecommerce")]
+[Route("api/Ecommerce/LogInLogOut")]
 [ApiController]
 public class EcommerceController : ControllerBase
 {
-
+  
     [HttpPost("SignUp", Name = "SignUp")]
 
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -21,6 +25,8 @@ public class EcommerceController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<bool>> SignUp([FromBody] DTOUser User)
     {
+        Response.Cookies.Delete("Authentication");
+
         if (User == null) { return BadRequest("Invalaid User information"); }
         if (string.IsNullOrEmpty(User.Person.Email)) { return BadRequest("Invalaid User information(Email)"); }
         if (string.IsNullOrEmpty(User.UserName)) { return BadRequest("Invalaid User information(UserName)"); }
@@ -30,9 +36,9 @@ public class EcommerceController : ControllerBase
         {
             return BadRequest("Select another user name ");
         }
-     
+
         //send verfication email
-      
+
 
         //Create  a user obj with a hash passWord
 
@@ -45,14 +51,15 @@ public class EcommerceController : ControllerBase
             return StatusCode(500, "An unexpected server error occurred.");
 
         }
-        
+
         User.UserPassword = hashedPassword;
- 
+
         clsUser NewCustomer = new clsUser(User);
 
         bool Responce = await NewCustomer.SaveCustomer();
 
-        if (!Responce) { 
+        if (!Responce)
+        {
 
             return StatusCode(500, "An unexpected server error occurred.");
 
@@ -60,9 +67,9 @@ public class EcommerceController : ControllerBase
 
         Guid NewGUID_ID = Guid.NewGuid();
 
-        clsValidatingEmail UnValaidEmail = new clsValidatingEmail(NewCustomer.PersonID,NewGUID_ID);
-    
-        if ( await UnValaidEmail.Add())
+        clsValidatingEmail UnValaidEmail = new clsValidatingEmail(NewCustomer.PersonID, NewGUID_ID);
+
+        if (await UnValaidEmail.Add())
         {
             try
             {
@@ -168,11 +175,11 @@ public class EcommerceController : ControllerBase
         }
         else
         {
-         await  clsUser.Delete(NewCustomer.UserID);
-         await clsPerson.Delete(NewCustomer.PersonID);
+            await clsUser.Delete(NewCustomer.UserID);
+            await clsPerson.Delete(NewCustomer.PersonID);
             NewCustomer = null;
 
-         return StatusCode(500, "An unexpected server error occurred.");
+            return StatusCode(500, "An unexpected server error occurred.");
 
 
 
@@ -181,7 +188,7 @@ public class EcommerceController : ControllerBase
 
     }
 
-     
+
     [HttpPost("LogIn", Name = "LogIn")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -193,8 +200,8 @@ public class EcommerceController : ControllerBase
         if (string.IsNullOrEmpty(User.UserPassword)) { return BadRequest("Invalaid User information(PassWord) "); }
 
         clsUser? ExsistedCustomer = await clsUser.Find(User.UserName);
- 
-        if (ExsistedCustomer==null)
+
+        if (ExsistedCustomer == null)
         {
 
             return BadRequest("User name or PassWord Are incorect");
@@ -203,9 +210,9 @@ public class EcommerceController : ControllerBase
 
         var hasher = new PasswordHasher<object>();
 
-        var VerifyhashedPassword = hasher.VerifyHashedPassword(null,ExsistedCustomer.PassWord,User.UserPassword);
+        var VerifyhashedPassword = hasher.VerifyHashedPassword(null, ExsistedCustomer.PassWord, User.UserPassword);
 
-        if (VerifyhashedPassword== PasswordVerificationResult.Failed)
+        if (VerifyhashedPassword == PasswordVerificationResult.Failed)
         {
             return BadRequest("User name or PassWord Are incorect");
 
@@ -223,7 +230,7 @@ public class EcommerceController : ControllerBase
 
         if (!string.IsNullOrEmpty(TOtoken))
         {
-            Response.Cookies.Append("Authentication", TOtoken , cookieOptions);
+            Response.Cookies.Append("Authentication", TOtoken, cookieOptions);
 
             return Ok("LogIn seccessfuly");
 
@@ -247,12 +254,12 @@ public class EcommerceController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<bool>> IsUserNameFreeToUse([FromBody] string UserName)
     {
-         if (string.IsNullOrEmpty(UserName)) { return BadRequest("Invalaid User information(User Name)"); }
-        clsUser? IsUserIxsiste=await clsUser.Find(UserName);    
-        return Ok(IsUserIxsiste==null);
+        if (string.IsNullOrEmpty(UserName)) { return BadRequest("Invalaid User information(User Name)"); }
+        clsUser? IsUserIxsiste = await clsUser.Find(UserName);
+        return Ok(IsUserIxsiste == null);
 
 
-        
+
     }
 
 
@@ -263,55 +270,49 @@ public class EcommerceController : ControllerBase
 
 
 
- 
-        var cookieOptions = new CookieOptions
-        {
-            HttpOnly = true,   // Prevent JavaScript access
-            Secure = true,     // Only send over HTTPS
-            SameSite = SameSiteMode.Strict, // Prevent CSRF attacks
-            Expires = DateTime.UtcNow.AddHours(1) // Set expiration
-        };
+
+       
 
 
-        
-            Response.Cookies.Delete("Authentication");
 
-            return Ok(true);
+        Response.Cookies.Delete("Authentication");
 
-        
+        return Ok(true);
 
-      
+
+
+
 
 
 
 
     }
-     
+
 
     [HttpGet("IsLogedIn", Name = "IsLogedIn")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<bool>> IsLogedIn()
-     {
+    {
 
         if (Request.Cookies.TryGetValue("Authentication", out string token))
         {
-            int? UserID=clsGlobale.ExtractUserIdFromToken(token);
-        
-            if (UserID==null)
+            int? UserID = clsGlobale.ExtractUserIdFromToken(token);
+
+            if (UserID == null)
             {
                 return StatusCode(500, "An unexpected server error occurred.");
             }
 
             else
             {
-                if(await clsUser.Find(UserID.Value) != null)
+                if (await clsUser.Find(UserID.Value) != null)
                 {
                     return Ok(true);
                 }
                 else
                 {
-                   // Response.Cookies.Delete("Authentication");
+                    // Response.Cookies.Delete("Authentication");
                     return Ok(false);
                 }
             }
@@ -331,10 +332,11 @@ public class EcommerceController : ControllerBase
     {
         clsValidatingEmail? validatingEmail = await clsValidatingEmail.Find(GUID_ID);
 
-        if (validatingEmail == null) {
+        if (validatingEmail == null)
+        {
 
             return BadRequest("Pleas Check if your account is active or  Sign up again ");
-              
+
         }
 
         clsUser? User = await clsUser.FindByPersonID(validatingEmail.PersonID);
@@ -347,7 +349,7 @@ public class EcommerceController : ControllerBase
         {
             return StatusCode(500, "Unable to Acive the account and confirme the email");
         }
-       
+
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,   // Prevent JavaScript access
@@ -358,11 +360,11 @@ public class EcommerceController : ControllerBase
         string? _GUIDID = clsGlobale.GenerateJwtToken(User.DTOUser);
         if (!string.IsNullOrEmpty(_GUIDID))
         {
-            Response.Cookies.Append("Authentication",_GUIDID, cookieOptions);
+            Response.Cookies.Append("Authentication", _GUIDID, cookieOptions);
 
-             
+
             return Ok("Email verfied seccessfuly");
-           
+
         }
 
         else
@@ -374,5 +376,8 @@ public class EcommerceController : ControllerBase
     }
 
 
-     
+  
+
+
+
 }

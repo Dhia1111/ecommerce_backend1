@@ -25,6 +25,11 @@ namespace Ecommerce1
             return _configuration["AppSettings:JWT_SECRET"];
         }
 
+        public static string SetImageURL(string ImageName)
+        {
+            return _configuration["ImagesUrl"].ToString()+ImageName;
+        }
+
         public static string GetEmail()
         {
             return _configuration["Email"];
@@ -40,7 +45,10 @@ namespace Ecommerce1
             return _configuration["EmailPassWord"];
         }
 
-
+        public static string GetLoadDiractory()
+        {
+            return _configuration["UploadDiractory"];
+        }
         public static string? ConectionString()
         {
             return _configuration["ConnectionString"];

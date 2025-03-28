@@ -5,7 +5,520 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/Ecommerce/SignUp": {
+    "/api/Ecommerce/CustomerMangment/CartItems": {
+      "get": {
+        "tags": [
+          "clsCustomerMangmentAPIs"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Ecommerce/CustomerMangment/GetPerson": {
+      "get": {
+        "tags": [
+          "clsCustomerMangmentAPIs"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DTOPerson"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DTOPerson"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DTOPerson"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Ecommerce/ProductMangment/AddProduct": {
+      "post": {
+        "tags": [
+          "clsProductMangentAPIs"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "stProduct": {
+                    "type": "string"
+                  },
+                  "Image": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "stcatigories": {
+                    "type": "string"
+                  },
+                  "Product.ID": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "Product.Name": {
+                    "type": "string"
+                  },
+                  "Product.Price": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "Product.ImageName": {
+                    "type": "string"
+                  },
+                  "Product.ImageUrl": {
+                    "type": "string"
+                  },
+                  "Product.Catigories": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/enCatigories"
+                    }
+                  },
+                  "CatigoriesList": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/enCatigories"
+                    }
+                  }
+                }
+              },
+              "encoding": {
+                "stProduct": {
+                  "style": "form"
+                },
+                "Image": {
+                  "style": "form"
+                },
+                "stcatigories": {
+                  "style": "form"
+                },
+                "Product.ID": {
+                  "style": "form"
+                },
+                "Product.Name": {
+                  "style": "form"
+                },
+                "Product.Price": {
+                  "style": "form"
+                },
+                "Product.ImageName": {
+                  "style": "form"
+                },
+                "Product.ImageUrl": {
+                  "style": "form"
+                },
+                "Product.Catigories": {
+                  "style": "form"
+                },
+                "CatigoriesList": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Ecommerce/ProductMangment/UpdateProduct": {
+      "post": {
+        "tags": [
+          "clsProductMangentAPIs"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "stProduct": {
+                    "type": "string"
+                  },
+                  "Image": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "stcatigories": {
+                    "type": "string"
+                  },
+                  "Product.ID": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "Product.Name": {
+                    "type": "string"
+                  },
+                  "Product.Price": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "Product.ImageName": {
+                    "type": "string"
+                  },
+                  "Product.ImageUrl": {
+                    "type": "string"
+                  },
+                  "Product.Catigories": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/enCatigories"
+                    }
+                  },
+                  "CatigoriesList": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/enCatigories"
+                    }
+                  }
+                }
+              },
+              "encoding": {
+                "stProduct": {
+                  "style": "form"
+                },
+                "Image": {
+                  "style": "form"
+                },
+                "stcatigories": {
+                  "style": "form"
+                },
+                "Product.ID": {
+                  "style": "form"
+                },
+                "Product.Name": {
+                  "style": "form"
+                },
+                "Product.Price": {
+                  "style": "form"
+                },
+                "Product.ImageName": {
+                  "style": "form"
+                },
+                "Product.ImageUrl": {
+                  "style": "form"
+                },
+                "Product.Catigories": {
+                  "style": "form"
+                },
+                "CatigoriesList": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Ecommerce/ProductMangment/DeleteProduct": {
+      "post": {
+        "tags": [
+          "clsProductMangentAPIs"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Ecommerce/ProductMangment/GetProduct/{ID}": {
+      "get": {
+        "tags": [
+          "clsProductMangentAPIs"
+        ],
+        "parameters": [
+          {
+            "name": "ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DTOProduct"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DTOProduct"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DTOProduct"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Ecommerce/ProductMangment/GetAllProducts": {
+      "get": {
+        "tags": [
+          "clsProductMangentAPIs"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DTOProduct"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DTOProduct"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DTOProduct"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Ecommerce/ProductMangment/GetAllProductsForCatigory/{CatigoryID}": {
+      "get": {
+        "tags": [
+          "clsProductMangentAPIs"
+        ],
+        "parameters": [
+          {
+            "name": "CatigoryID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/enCatigories"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DTOProduct"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DTOProduct"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DTOProduct"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/Ecommerce/LogInLogOut/SignUp": {
       "post": {
         "tags": [
           "Ecommerce"
@@ -77,7 +590,7 @@
         }
       }
     },
-    "/api/Ecommerce/LogIn": {
+    "/api/Ecommerce/LogInLogOut/LogIn": {
       "post": {
         "tags": [
           "Ecommerce"
@@ -149,7 +662,7 @@
         }
       }
     },
-    "/api/Ecommerce/IsUserNameAvalibale": {
+    "/api/Ecommerce/LogInLogOut/IsUserNameAvalibale": {
       "post": {
         "tags": [
           "Ecommerce"
@@ -218,7 +731,7 @@
         }
       }
     },
-    "/api/Ecommerce/LogOut": {
+    "/api/Ecommerce/LogInLogOut/LogOut": {
       "get": {
         "tags": [
           "Ecommerce"
@@ -248,7 +761,7 @@
         }
       }
     },
-    "/api/Ecommerce/IsLogedIn": {
+    "/api/Ecommerce/LogInLogOut/IsLogedIn": {
       "get": {
         "tags": [
           "Ecommerce"
@@ -281,7 +794,7 @@
         }
       }
     },
-    "/api/Ecommerce/verify-email": {
+    "/api/Ecommerce/LogInLogOut/verify-email": {
       "post": {
         "tags": [
           "Ecommerce"
@@ -377,6 +890,39 @@
         },
         "additionalProperties": false
       },
+      "DTOProduct": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "imageName": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "catigories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/enCatigories"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "DTOUser": {
         "type": "object",
         "properties": {
@@ -439,6 +985,22 @@
           }
         },
         "additionalProperties": { }
+      },
+      "enCatigories": {
+        "enum": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "enRole": {
         "enum": [

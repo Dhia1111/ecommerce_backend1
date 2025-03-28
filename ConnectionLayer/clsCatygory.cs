@@ -9,9 +9,11 @@ using System.Threading.Tasks;
 
 public class DTOCatygory {
 
+   public enum enCatigories {BestSaling=1, populer,New ,PhoneCases,Chargers,Cables,ScreenProtectors,Luxury_Leather,Tech_Accessories,EveryDay_Essentials} 
     public int ID {  get; set; }
     public string Name { get; set; }
-    public DTOCatygory(int ID, string Name) {
+    public DTOCatygory(int ID, string Name)
+    {
 
         this.ID = ID;
         this.Name = Name;
@@ -21,7 +23,7 @@ public class DTOCatygory {
 namespace ConnectionLayer
 {
     
-    public static class clsCatygorie
+    public static class clsCatygory
     
     {
 
@@ -223,6 +225,63 @@ namespace ConnectionLayer
             return Catygories;
         }
 
+        public static async Task<List<DTOCatygory.enCatigories>?> GetAll(int ID)
+        {
+            string qery = "Select*From CatigoriesManager where ProductID=@ProductID";
+
+
+            List<DTOCatygory.enCatigories> Catygories = new List<DTOCatygory.enCatigories>();
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsConnectionGenral.ConnectionString))
+                {
+                    connection.Open();
+
+                    using (SqlCommand command = new SqlCommand(qery, connection))
+                    {
+
+                        command.Parameters.AddWithValue("@ProductID", ID);
+                        using (SqlDataReader Reader = await command.ExecuteReaderAsync())
+                        {
+                            while (Reader.Read())
+                            {
+                                if (int.TryParse(Reader["CatigoryID"].ToString(), out int CatyGoryID))
+                                {
+                                    Catygories.Add((DTOCatygory.enCatigories)CatyGoryID);
+                                }
+                                else
+                                {
+                                    continue;
+                                }
+
+
+
+
+
+                            }
+
+                        }
+
+
+                    }
+
+                }
+            }
+
+
+            catch
+            {
+
+                return null;
+            }
+
+
+
+
+            return Catygories;
+        }
+
 
         public static async Task<int> Add(DTOCatygory dTOCatygory)
         {
@@ -377,6 +436,110 @@ namespace ConnectionLayer
 
 
             return true;
+
+        }
+
+        public static async Task<bool> DeleteAllCatigories(int ProductID)
+        {
+
+            string qery = @"Delete   CatigoriesManager  where ProductID=@ProductID";
+
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsConnectionGenral.ConnectionString))
+                {
+                    connection.Open();
+
+                    using (SqlCommand command = new SqlCommand(qery, connection))
+                    {
+
+                        command.Parameters.AddWithValue("@ProductID", ProductID);
+
+
+                        int NumberRowAffected = await command.ExecuteNonQueryAsync();
+
+                        if (NumberRowAffected == 0)
+                        {
+
+                            return false;
+
+                        }
+
+
+                    }
+
+                }
+            }
+
+
+            catch
+            {
+
+                return false;
+            }
+
+
+
+
+            return true;
+
+        }
+
+
+        public static async Task<int> AddCtaigoryToProduct(int ProductID,int CatigoryID)
+        {
+
+            string qery = @"insert into CatigoriesManager(ProductID,CatigoryID)
+                values(@ProductID,@CatigoryID);Select SCOPE_IDENTITY()";
+
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsConnectionGenral.ConnectionString))
+                {
+                    connection.Open();
+
+                    using (SqlCommand command = new SqlCommand(qery, connection))
+                    {
+
+                        command.Parameters.AddWithValue("@CatigoryID", CatigoryID);
+                        command.Parameters.AddWithValue("@ProductID", ProductID);
+
+
+
+                        object? objPersonID = await command.ExecuteScalarAsync();
+
+                        if (objPersonID != null)
+                        {
+
+                            if (int.TryParse(objPersonID.ToString(), out int ID))
+                            {
+                                return ID;
+                            }
+                            else
+                            {
+                                return -1;
+                            }
+                        }
+
+
+                    }
+
+                }
+            }
+
+
+            catch
+            {
+
+                return -1;
+            }
+
+
+
+
+            return -1;
 
         }
 
