@@ -1,7 +1,15 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\Quick Tech\\Documents\\Visual Studio 2022\\Templates\\ProjectTemplates\\C#\\ecommerce_backend1\\Ecommerce1\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{F97A7303-B394-48C9-B4A6-085ED0C1CCFE}|Ecommerce1.csproj|c:\\users\\quick tech\\documents\\visual studio 2022\\templates\\projecttemplates\\c#\\ecommerce_backend1\\ecommerce1\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{F97A7303-B394-48C9-B4A6-085ED0C1CCFE}|Ecommerce1.csproj|solutionrelative:.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4FC1250-33EB-437C-B131-C5E63A93A225}|..\\BusinessLayer\\BusinessLayer.csproj|c:\\users\\quick tech\\documents\\visual studio 2022\\templates\\projecttemplates\\c#\\ecommerce_backend1\\businesslayer\\businesslayer.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,7 +17,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -22,6 +30,32 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": ".gitignore",
+              "DocumentMoniker": "C:\\Users\\Quick Tech\\Documents\\Visual Studio 2022\\Templates\\ProjectTemplates\\C#\\ecommerce_backend1\\Ecommerce1\\.gitignore",
+              "RelativeDocumentMoniker": ".gitignore",
+              "ToolTip": "C:\\Users\\Quick Tech\\Documents\\Visual Studio 2022\\Templates\\ProjectTemplates\\C#\\ecommerce_backend1\\Ecommerce1\\.gitignore",
+              "RelativeToolTip": ".gitignore",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-04-09T20:46:21.619Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "BusinessLayer",
+              "DocumentMoniker": "C:\\Users\\Quick Tech\\Documents\\Visual Studio 2022\\Templates\\ProjectTemplates\\C#\\ecommerce_backend1\\BusinessLayer\\BusinessLayer.csproj",
+              "RelativeDocumentMoniker": "..\\BusinessLayer\\BusinessLayer.csproj",
+              "ToolTip": "C:\\Users\\Quick Tech\\Documents\\Visual Studio 2022\\Templates\\ProjectTemplates\\C#\\ecommerce_backend1\\BusinessLayer\\BusinessLayer.csproj",
+              "RelativeToolTip": "..\\BusinessLayer\\BusinessLayer.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-04-09T20:46:06.075Z",
+              "EditorCaption": ""
             }
           ]
         }
