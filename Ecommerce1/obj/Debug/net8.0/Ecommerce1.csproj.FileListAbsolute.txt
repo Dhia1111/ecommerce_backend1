@@ -85,3 +85,4 @@ C:\Users\Quick Tech\Documents\Visual Studio 2022\Templates\ProjectTemplates\C#\e
 C:\Users\Quick Tech\Documents\Visual Studio 2022\Templates\ProjectTemplates\C#\ecommerce_backend1\Ecommerce1\obj\Debug\net8.0\Ecommerce1.pdb
 C:\Users\Quick Tech\Documents\Visual Studio 2022\Templates\ProjectTemplates\C#\ecommerce_backend1\Ecommerce1\obj\Debug\net8.0\Ecommerce1.genruntimeconfig.cache
 C:\Users\Quick Tech\Documents\Visual Studio 2022\Templates\ProjectTemplates\C#\ecommerce_backend1\Ecommerce1\obj\Debug\net8.0\ref\Ecommerce1.dll
+C:\Users\Quick Tech\Documents\Visual Studio 2022\Templates\ProjectTemplates\C#\ecommerce_backend1\Ecommerce1\bin\Debug\net8.0\Stripe.net.dll

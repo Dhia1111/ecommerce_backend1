@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace BusinessLayer
 {
@@ -16,6 +17,7 @@ namespace BusinessLayer
         int _ID;
         public int ID { get { return _ID; } }
 
+        List<int> _ProductIdsList;
         public string PaymentMethodID { get; set; }
 
         public DTOTransaction.enState State { get; set; }
@@ -28,21 +30,20 @@ namespace BusinessLayer
 
         public DTOTransaction dtoTransaction { get { return new DTOTransaction(this._ID, this.PaymentMethodID, this.State, this.TotolePrice, this.CustomerID, this.TransactionGUID.ToString()); } }
 
-         clsTransaction(int ID, string PaymentMethodID, DTOTransaction.enState State, decimal TotolePrice, int CustomerID, string TransactionGUID)
-        {
-            this._ID = ID;
-            this.PaymentMethodID = PaymentMethodID;
-            this.State = State;
-            this.TotolePrice = TotolePrice;
-            this.CustomerID = CustomerID;
-            this.TransactionGUID =Guid.TryParse(TransactionGUID,out Guid GUID)?GUID:Guid.Empty ;
-
+         clsTransaction(DTOTransaction dto)  {
+            if (dto == null) return;
+            this._ID = dto.ID.Value;
+            this.PaymentMethodID = dto.PaymentMethodID;
+            this.State = dto.State.Value;
+            this.TotolePrice = dto.TotolePrice.Value;
+            this.CustomerID = dto.CustomerID.Value;
+            this.TransactionGUID =Guid.TryParse(dto.TransactionGUID,out Guid GUID)?GUID:Guid.Empty ;
             this._Mode = enMode.Update;
         
         }
 
 
-        public clsTransaction( string PaymentMethodID, DTOTransaction.enState State, decimal TotolePrice, int CustomerID, string TransactionGUID)
+        public clsTransaction( string PaymentMethodID, DTOTransaction.enState State, decimal TotolePrice, int CustomerID, string TransactionGUID,List<int>ProductIncludedIDsList)
         {
             this._ID = -1;
             this.PaymentMethodID = PaymentMethodID;
@@ -51,13 +52,29 @@ namespace BusinessLayer
             this.CustomerID = CustomerID;
             this.TransactionGUID = Guid.TryParse(TransactionGUID, out Guid GUID) ? GUID : Guid.Empty;
             this._Mode = enMode.Add;
+            this._ProductIdsList = ProductIncludedIDsList;
+
         }
 
         async Task<bool> _Add()
         {
+            bool SavingProductResult = false;
 
+           
              this._ID= await ConnectionLayer.clsTransaction.Add(this.dtoTransaction);
-            return _ID != -1;
+            if (_ID == -1) return false;
+
+            foreach (int IncludedProductID in this._ProductIdsList)
+            {
+
+                clsIncludedProduct IncludedProduct = new clsIncludedProduct(this._ID, IncludedProductID);
+
+                SavingProductResult = await IncludedProduct.Save();
+
+                if (!SavingProductResult) return false;
+            }
+            return true;
+
         }
         async Task<bool> _Update()
         {
@@ -93,7 +110,11 @@ namespace BusinessLayer
             return result;
         }
    
-
+        public static async Task <clsTransaction?>Find(Guid Id)
+        {
+          DTOTransaction ?DTO= await  ConnectionLayer.clsTransaction.Find(Id);
+            return DTO != null ? new clsTransaction(DTO) : null;
+        }
 
     
     

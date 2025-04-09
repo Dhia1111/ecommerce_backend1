@@ -8,31 +8,29 @@ using System.Threading.Tasks;
 public class DTOCartItem 
 {
     
-    public int CartID {  get; set; }
+    public int? CartID {  get; set; }
 
     public  uint NumberOfItems {  get; set; }
 
-    public int UserID { get; set; }
+    public int? UserID { get; set; }
 
     public int ProductID {  get; set; }
-    public string ImageURL { get; set; }
+    public string? ImageURL { get; set; }
 
-    public DTOProduct Product;
-    public DTOCartItem() { 
+     public DTOCartItem() { 
              CartID = -1;
         this.UserID = -1;
         this.ProductID = -1;
         this.NumberOfItems = 1;
         this.ImageURL = "";
-        Product = new DTOProduct(-1, "", 0, "");
-    }
+     }
     public DTOCartItem(int CartID,int UserID,int ProductID,uint NumberOfProducts)
     {
         this.CartID =CartID;
         this.UserID = UserID;
         this.ProductID = ProductID;
         this.NumberOfItems =NumberOfProducts;
-        Product = new DTOProduct(-1, "", 0, "");
+        
         this.ImageURL = "";
 
     }
@@ -44,149 +42,150 @@ namespace ConnectionLayer
    
     public static class clsCartItem
     {
-        //public static async Task<DTOCartItem?> Find(int ID)
-        //{
+        public static async Task<DTOCartItem?> Find(int UserID, int ProductID)
+        {
 
 
-        //    string qery = "select top 1* From CartItems where CatygoryID=@CatygoryID";
+            string qery = "select top 1* From CartItems where UserID=@UserID and ProductID=@ProductID ";
 
 
-        //    try
-        //    {
-        //        using (SqlConnection connection = new SqlConnection(clsConnectionGenral.ConnectionString))
-        //        {
-        //            connection.Open();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsConnectionGenral.ConnectionString))
+                {
+                    connection.Open();
 
-        //            using (SqlCommand command = new SqlCommand(qery, connection))
-        //            {
+                    using (SqlCommand command = new SqlCommand(qery, connection))
+                    {
 
-        //                command.Parameters.AddWithValue("@CatygoryID", ID);
+                        command.Parameters.AddWithValue("@UserID", UserID);
+                        command.Parameters.AddWithValue("@ProductID", ProductID);
 
 
-        //                using (SqlDataReader Reader = await command.ExecuteReaderAsync())
-        //                {
+                        using (SqlDataReader Reader = await command.ExecuteReaderAsync())
+                        {
 
-        //                    if (Reader.Read())
-        //                    {
+                            if (Reader.Read())
+                            {
 
 
-        //                        DTO CatyGory = new DTOCart(-1, "");
+                                DTOCartItem cartItem = new DTOCartItem();
 
 
-        //                        if (!(int.TryParse(Reader["CatygoryID"].ToString(), out int CatygoryID) ||
-        //                           Reader["CatygoryName"] == null))
+                                if (int.TryParse(Reader["CartItemID"].ToString(), out int CartItemID) && int.TryParse(Reader["UserID"].ToString(), out int MyUserID) && int.TryParse(Reader["ProductID"].ToString(), out int MyProductID) && int.TryParse(Reader["Number"].ToString(), out int NumberOfItems))
 
-        //                        {
 
-        //                            CatyGory.ID = CatygoryID;
-        //                            CatyGory.Name = Reader["CatygoryName"].ToString();
 
+                                {
+                                    cartItem.CartID = CartItemID;
+                                    cartItem.UserID = MyUserID;
+                                    cartItem.ProductID = MyProductID;
+                                    cartItem.NumberOfItems = uint.Parse(NumberOfItems.ToString());
 
+                                    return cartItem;
+                                }
 
-        //                            return CatyGory;
-        //                        }
 
 
 
 
 
+                            }
 
-        //                    }
+                        }
 
-        //                }
 
+                    }
 
-        //            }
+                }
+            }
 
-        //        }
-        //    }
 
+            catch
+            {
 
-        //    catch
-        //    {
+                return null;
+            }
 
-        //        return null;
-        //    }
 
+            return null;
 
-        //    return null;
 
 
+        }
+        public static async Task<DTOCatygory?> Find(string Name)
+        {
 
-        //}
-        //public static async Task<DTOCatygory?> Find(string Name)
-        //{
+            string qery = "select top 1* From Catigories where CatygoryName=@CatygoryName";
 
-        //    string qery = "select top 1* From Catigories where CatygoryName=@CatygoryName";
 
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsConnectionGenral.ConnectionString))
+                {
+                    connection.Open();
 
-        //    try
-        //    {
-        //        using (SqlConnection connection = new SqlConnection(clsConnectionGenral.ConnectionString))
-        //        {
-        //            connection.Open();
+                    using (SqlCommand command = new SqlCommand(qery, connection))
+                    {
 
-        //            using (SqlCommand command = new SqlCommand(qery, connection))
-        //            {
+                        command.Parameters.AddWithValue("@CatygoryName", Name);
 
-        //                command.Parameters.AddWithValue("@CatygoryName", Name);
 
+                        using (SqlDataReader Reader = await command.ExecuteReaderAsync())
+                        {
 
-        //                using (SqlDataReader Reader = await command.ExecuteReaderAsync())
-        //                {
+                            if (Reader.Read())
+                            {
 
-        //                    if (Reader.Read())
-        //                    {
 
+                                DTOCatygory CatyGory = new DTOCatygory(-1, "");
 
-        //                        DTOCatygory CatyGory = new DTOCatygory(-1, "");
 
+                                if (!(int.TryParse(Reader["CatygoryID"].ToString(), out int CatygoryID) ||
+                                   Reader["CatygoryName"] == null))
 
-        //                        if (!(int.TryParse(Reader["CatygoryID"].ToString(), out int CatygoryID) ||
-        //                           Reader["CatygoryName"] == null))
+                                {
 
-        //                        {
+                                    CatyGory.ID = CatygoryID;
+                                    CatyGory.Name = Reader["CatygoryName"].ToString();
 
-        //                            CatyGory.ID = CatygoryID;
-        //                            CatyGory.Name = Reader["CatygoryName"].ToString();
 
 
+                                    return CatyGory;
+                                }
 
-        //                            return CatyGory;
-        //                        }
 
 
 
 
 
+                            }
 
-        //                    }
+                        }
 
-        //                }
 
+                    }
 
-        //            }
+                }
+            }
 
-        //        }
-        //    }
 
+            catch
+            {
 
-        //    catch
-        //    {
+                return null;
+            }
 
-        //        return null;
-        //    }
 
+            return null;
 
-        //    return null;
 
 
 
 
+        }
 
-        //}
-       
-             
+
         public static async Task<List<DTOCartItem>?> GetCart(int UserID)
         {
             string qery = "Select*From CartItems where UserID=@UserID ";
@@ -212,7 +211,6 @@ namespace ConnectionLayer
                                 {
                                     DTOProduct? p =await ConnectionLayer.clsProduct.Find(ProductID);
                                     DTOCartItem cartItem = new DTOCartItem(CartItemID, UserID, ProductID, NumberOfProducts);
-                                  if(p!=null)  cartItem.Product = p;
                                     Cart.Add(cartItem);
                                 }
                                 else
@@ -248,9 +246,9 @@ namespace ConnectionLayer
         }
         public static async Task<int> Add(DTOCartItem CartItem)
         {
-            string qery = "insert into CartItem(UserID,ProductID,Number)" +
-                "values(@UserID,@ProductID,@Number);Select SCOPE_IDENTITY()";
-
+             string qery = @"insert into CartItems(UserID,ProductID,Number,IncludedProductDate)
+       values(@UserID,@ProductID,@Number,@IncludedProductDate);Select SCOPE_IDENTITY()";
+             
             try
             {
                 using (SqlConnection connection = new SqlConnection(clsConnectionGenral.ConnectionString))
@@ -261,8 +259,9 @@ namespace ConnectionLayer
                     {
 
                         command.Parameters.AddWithValue("@UserID", CartItem.UserID);
-                        command.Parameters.AddWithValue("@ProductID", CartItem.UserID);
-                        command.Parameters.AddWithValue("@Number", CartItem.NumberOfItems);
+                        command.Parameters.AddWithValue("@ProductID", CartItem.ProductID);
+                        command.Parameters.AddWithValue("@Number", int.Parse(CartItem.NumberOfItems.ToString()));
+                        command.Parameters.AddWithValue("@IncludedProductDate", DateTime.Now);
 
 
                         object? objCartItemID = await command.ExecuteScalarAsync();
@@ -304,13 +303,13 @@ namespace ConnectionLayer
         public static async Task<bool> Update(DTOCartItem CartItem)
         {
 
-            string qery = @"Update CartItem set 
+            string qery = @"Update CartItems set 
                        
-               Number=  @Number,
+               Number=  @Number
               
         where         
  
-               UserID=@UserID && 
+               UserID=@UserID and
                ProductID=@ProductID       
                       
 ";
@@ -326,7 +325,7 @@ namespace ConnectionLayer
                     using (SqlCommand command = new SqlCommand(qery, connection))
                     {
 
-                        command.Parameters.AddWithValue("@Number", CartItem.NumberOfItems);
+                        command.Parameters.AddWithValue("@Number",int.Parse(CartItem.NumberOfItems.ToString()));
                         command.Parameters.AddWithValue("@UserID", CartItem.UserID);
                         command.Parameters.AddWithValue("@ProductID", CartItem.ProductID);
 
@@ -407,8 +406,52 @@ namespace ConnectionLayer
 
         }
 
+        public static async Task<bool> ClearCart(int ID)
+        {
+
+            string qery = @"Delete from  CartItems  where UserID=@UserID";
 
 
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsConnectionGenral.ConnectionString))
+                {
+                    connection.Open();
+
+                    using (SqlCommand command = new SqlCommand(qery, connection))
+                    {
+
+                        command.Parameters.AddWithValue("@UserID", ID);
+
+
+                        int NumberRowAffected = await command.ExecuteNonQueryAsync();
+
+                        if (NumberRowAffected == 0)
+                        {
+
+                            return false;
+
+                        }
+
+
+                    }
+
+                }
+            }
+
+
+            catch
+            {
+
+                return false;
+            }
+
+
+
+
+            return true;
+
+        }
 
 
     }

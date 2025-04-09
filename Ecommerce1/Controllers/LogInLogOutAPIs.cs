@@ -9,6 +9,7 @@ using BusinessLayer;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 using System.Net.Mail;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
@@ -37,10 +38,6 @@ public class EcommerceController : ControllerBase
             return BadRequest("Select another user name ");
         }
 
-        //send verfication email
-
-
-        //Create  a user obj with a hash passWord
 
         var hasher = new PasswordHasher<object>();
 
@@ -226,11 +223,14 @@ public class EcommerceController : ControllerBase
             Expires = DateTime.UtcNow.AddHours(1) // Set expiration
         };
 
-        var TOtoken = clsGlobale.GenerateJwtToken(ExsistedCustomer.DTOUser);
-
-        if (!string.IsNullOrEmpty(TOtoken))
+        var AthorizationToken = clsGlobale.GenerateJwtToken(ExsistedCustomer.DTOUser);
+        var GuidIDToken=clsGlobale.GenerateJwtToken(Guid.NewGuid());
+   
+        
+        if (!string.IsNullOrEmpty(AthorizationToken)&&!string.IsNullOrEmpty(GuidIDToken))
         {
-            Response.Cookies.Append("Authentication", TOtoken, cookieOptions);
+            Response.Cookies.Append("Authentication", AthorizationToken, cookieOptions);
+            Response.Cookies.Append("GuidID",GuidIDToken, cookieOptions);
 
             return Ok("LogIn seccessfuly");
 
@@ -263,21 +263,65 @@ public class EcommerceController : ControllerBase
     }
 
 
-    [HttpGet("LogOut", Name = "LogOut")]
+    [HttpPost("LogOut", Name = "LogOut")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult<bool> LogOut()
-    {
-
-
-
-
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<object>>  LogOut([FromBody]List<DTOCartItem>CartItems)
+     {
+        clsUser? user;
        
+        if (Request.Cookies.TryGetValue("Authentication", out string token))
+        {
+            int? UserID = clsGlobale.ExtractUserIdFromToken(token);
+
+            if (UserID == null)
+            {
+                Response.Cookies.Delete("Authentication");
+                Response.Cookies.Delete("GuidID");
+                return StatusCode(500, new {Status="failed",Message="Cookie is not valid",ErrorType= "Extracting Data from Cookie " });
+
+            }
+            
+
+            else
+            {
+               user = await clsUser.Find(UserID.Value);
+                if (user == null)
+                {
+                    Response.Cookies.Delete("Authentication");
+
+                    Response.Cookies.Delete("GuidID");
+
+                    return StatusCode(500, new { Status = "failed", Message = "Cookie is not valid", ErrorType = "Find User with the extracted data " });
+
+                }
+
+            }
+        }
+        else
+        {
+            Response.Cookies.Delete("Authentication");
+            Response.Cookies.Delete("GuidID");
+
+            return BadRequest(new { Status = "failed", Message = "Cookie is Does not exsist and you need to log in again", ErrorType = "Validation" });
+        }
+        
+
+        foreach (DTOCartItem item in CartItems)
+        {
+            await user.UpdateToCart(item);
+        }
+
+
 
 
 
         Response.Cookies.Delete("Authentication");
+        Response.Cookies.Delete("GuidID");
 
-        return Ok(true);
+           return Ok( new { Status = "Succeeded", Message = "LogOut done secsesfuly", ErrorType = "" });
+
 
 
 
@@ -306,13 +350,16 @@ public class EcommerceController : ControllerBase
 
             else
             {
-                if (await clsUser.Find(UserID.Value) != null)
+                clsUser? user = await clsUser.Find(UserID.Value);
+                if (user!= null)
                 {
                     return Ok(true);
                 }
                 else
                 {
-                    // Response.Cookies.Delete("Authentication");
+                     Response.Cookies.Delete("Authentication");
+                    Response.Cookies.Delete("GuidID");
+
                     return Ok(false);
                 }
             }
@@ -339,9 +386,9 @@ public class EcommerceController : ControllerBase
 
         }
 
-        clsUser? User = await clsUser.FindByPersonID(validatingEmail.PersonID);
+          clsUser? User = await clsUser.FindByPersonID(validatingEmail.PersonID);
 
-        if (User == null) { return StatusCode(500, "Un internale server error"); }
+          if (User == null) { return StatusCode(500, "Un internale server error"); }
 
         bool result = await clsValidatingEmail.Delete(validatingEmail.PersonID);
 
@@ -357,11 +404,12 @@ public class EcommerceController : ControllerBase
             SameSite = SameSiteMode.Strict, // Prevent CSRF attacks
             Expires = DateTime.UtcNow.AddHours(1) // Set expiration
         };
-        string? _GUIDID = clsGlobale.GenerateJwtToken(User.DTOUser);
-        if (!string.IsNullOrEmpty(_GUIDID))
+        string? AuthenticationToken = clsGlobale.GenerateJwtToken(User.DTOUser);
+        string? GuidIdToken = clsGlobale.GenerateJwtToken(Guid.NewGuid());
+        if (!string.IsNullOrEmpty(AuthenticationToken)&&!string.IsNullOrEmpty(GuidIdToken))
         {
-            Response.Cookies.Append("Authentication", _GUIDID, cookieOptions);
-
+            Response.Cookies.Append("Authentication", AuthenticationToken, cookieOptions);
+            Response.Cookies.Append("GuidID", GuidIdToken, cookieOptions);
 
             return Ok("Email verfied seccessfuly");
 

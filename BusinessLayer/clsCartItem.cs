@@ -26,11 +26,12 @@ namespace BusinessLayer
         _CartItemID = -1;
             _Mode = enMode.Add;
         }
+      
         clsCartItem(DTOCartItem CartItem)
         {
-            this._CartItemID = CartItem.CartID;
+            this._CartItemID =CartItem.CartID==null?-1:CartItem.CartID.Value;
             this._Mode=enMode.Update;
-            this.UserID = CartItem.UserID;
+            this.UserID = CartItem.UserID==null?-1:CartItem.UserID.Value;
             this.ProductID = CartItem.ProductID;
             this.NumberOfItems = CartItem.NumberOfItems;
         }
@@ -80,6 +81,22 @@ namespace BusinessLayer
 
         }
     
-    
+        public static async Task<clsCartItem?>Find(int UserID, int ProductID)
+        {
+            DTOCartItem? dto_cart= await ConnectionLayer.clsCartItem.Find(UserID, ProductID);
+            if (dto_cart != null)
+            {
+                return new clsCartItem(dto_cart);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static async Task<bool> ClearCart(int UserID)
+        {
+            return await ConnectionLayer.clsCartItem.ClearCart(UserID);
+        }
     }
 }

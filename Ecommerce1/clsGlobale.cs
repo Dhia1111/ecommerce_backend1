@@ -24,6 +24,10 @@ namespace Ecommerce1
         {
             return _configuration["AppSettings:JWT_SECRET"];
         }
+        public static string GetStripSecret()
+        {
+            return _configuration["AppSettings:stripeSecretKey"];
+        }
 
         public static string SetImageURL(string ImageName)
         {
@@ -76,6 +80,28 @@ namespace Ecommerce1
             return tokenHandler.WriteToken(token);
         }
 
+        public static string? GenerateJwtToken(Guid GuidID)
+        {
+            if (string.IsNullOrEmpty(GetJwtSecret())) return null;
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(GetJwtSecret());
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, GuidID.ToString()),
+                }),
+                Expires = DateTime.UtcNow.AddHours(2),
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
         // **New method to extract UserID from a token**
         public static int? ExtractUserIdFromToken(string token)
         {
@@ -106,5 +132,36 @@ namespace Ecommerce1
                 return null; // Invalid token
             }
         }
+
+        public static Guid? ExtractGuidIDFromToken(string token)
+        {
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(GetJwtSecret()))
+                return null;
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(GetJwtSecret());
+
+            try
+            {
+                var parameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true
+                };
+
+                var principal = tokenHandler.ValidateToken(token, parameters, out SecurityToken validatedToken);
+                var GuidIDClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
+
+                return GuidIDClaim != null ? Guid.Parse(GuidIDClaim.Value) : null;
+            }
+            catch
+            {
+                return null; // Invalid token
+            }
+        }
+
     }
 }

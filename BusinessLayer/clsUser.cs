@@ -183,7 +183,7 @@ namespace BusinessLayer
             clsCartItem CartItem= new clsCartItem();
 
             CartItem.ProductID = cartitem.ProductID;
-            CartItem.UserID= cartitem.UserID;
+            CartItem.UserID= cartitem.UserID==null?-1:cartitem.UserID.Value;
             CartItem.NumberOfItems= cartitem.NumberOfItems;
            
             return await CartItem.Save();
@@ -191,21 +191,40 @@ namespace BusinessLayer
 
             
         }
-
         public async Task<bool> UpdateToCart(DTOCartItem cartitem)
         {
-            clsCartItem CartItem = new clsCartItem();
+            clsCartItem? FindCart =await clsCartItem.Find(this.UserID, cartitem.ProductID);
+            if (FindCart != null)
+            {
+               
+                FindCart.NumberOfItems=cartitem.NumberOfItems;
+                return await FindCart.Save();  
 
-            CartItem.ProductID = cartitem.ProductID;
-            CartItem.UserID = cartitem.UserID;
-            CartItem.NumberOfItems = cartitem.NumberOfItems;
+            }
+            else
+            {
 
-            return await CartItem.Save();
+                clsCartItem CartItem = new clsCartItem();
+
+                CartItem.ProductID = cartitem.ProductID;
+                CartItem.UserID = this.UserID;
+                CartItem.NumberOfItems = cartitem.NumberOfItems;
+                return await CartItem.Save();
+
+            }
+
 
 
 
         }
+        public async Task<bool> ClearCart()
+        {
 
+         return await   clsCartItem.ClearCart(this.UserID);
+
+
+
+        }
         public async Task<bool>DeleteProductFromUserCart(int ProductID)
         {
             return await clsCartItem.Delete(this.UserID, ProductID);

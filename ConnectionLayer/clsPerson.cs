@@ -272,7 +272,7 @@ namespace ConnectionLayer
               Phone=  @Phone,
               Country=  @Country,
               City=  @City,
-              PostCode=  @PostCode,
+              PostCode=  @PostCode
 
 where PersonID=@PersonID";
 

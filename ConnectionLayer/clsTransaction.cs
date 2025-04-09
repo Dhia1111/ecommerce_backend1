@@ -4,22 +4,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 public class DTOTransaction
 {
    public enum enState { Pending,Failed,Succeeded}
 
-    public int ID { get; set; }
+    public int ?ID { get; set; }
 
     public string PaymentMethodID { get; set; }
 
 
-    public enState State { get; set; }
+    public enState? State { get; set; }
 
-    public decimal TotolePrice { get; set; }
+    public decimal? TotolePrice { get; set; }
 
-    public int CustomerID { get; set; }
+    public int? CustomerID { get; set; }
 
-    public string TransactionGUID { get; set; }
+    public string? TransactionGUID { get; set; }
 
     public DTOTransaction(int ID, string PaymentMethodID, enState State, decimal TotolePrice, int CustomerID, string TransactionGUID)
     {
@@ -65,22 +66,94 @@ namespace ConnectionLayer
                             {
                                  DTOTransaction Transaction = new DTOTransaction(-1, "", 0, 0, -1, "");
 
-                                if (!(
-                                        int.TryParse(Reader["TransactionID"].ToString(), out int TransactionID) || 
-                                        byte.TryParse(Reader["TransactionState"].ToString(),out byte  State) || 
-                                        byte.TryParse(Reader["TransactionAtherization"].ToString(), out byte Atherization) || 
-                                        int.TryParse(Reader["TransactionTotolePrice"].ToString(), out int TotolePrice) || 
-                                        int.TryParse(Reader["TransactionUserID"].ToString(), out int CustomerID)||
-                                        Reader["TransactionPaymentMethodID"] == null || Reader["TransactionGUID"] == null)) 
+                                if (
+                            int.TryParse(Reader["TransactionID"].ToString(), out int TransactionID) &&
+                            byte.TryParse(Reader["TransactionState"].ToString(), out byte State) &&
+                            byte.TryParse(Reader["TransactionAtherization"].ToString(), out byte Atherization) &&
+                            int.TryParse(Reader["TransactionTotolePrice"].ToString(), out int TotolePrice) &&
+                            int.TryParse(Reader["TransactionUserID"].ToString(), out int CustomerID) &&
+                            Reader["TransactionPaymentMethodID"] != null && Reader["TransactionGUID"] != null)
+
                                 {
 
                                     Transaction.ID = TransactionID;
                                     Transaction.PaymentMethodID = Reader["TransactionPaymentMethodID"].ToString();
                                     Transaction.State = (DTOTransaction.enState)State;
                                     Transaction.TotolePrice = TotolePrice;
-                                    Transaction.CustomerID =CustomerID ;
+                                    Transaction.CustomerID = CustomerID;
                                     Transaction.TransactionGUID = Reader["TransactionGUID"].ToString();
-                                
+
+                                    return Transaction;
+                                }
+
+
+
+
+
+                            }
+
+                        }
+
+
+                    }
+
+                }
+            }
+
+
+            catch
+            {
+
+                return null;
+            }
+
+
+            return null;
+
+
+
+        }
+        public static async Task<DTOTransaction?> Find(Guid TransactionGuidID)
+        {
+
+
+            string qery = "select top 1* From Transactions where TransactionGUID=@TransactionGUID";
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(clsConnectionGenral.ConnectionString))
+                {
+                    connection.Open();
+
+                    using (SqlCommand command = new SqlCommand(qery, connection))
+                    {
+
+                        command.Parameters.AddWithValue("@TransactionGUID", TransactionGuidID.ToString());
+
+
+                        using (SqlDataReader Reader = await command.ExecuteReaderAsync())
+                        {
+
+                            if (Reader.Read())
+                            {
+                                DTOTransaction Transaction = new DTOTransaction(-1, "", 0, 0, -1, "");
+
+                                if (
+                                        int.TryParse(Reader["TransactionID"].ToString(), out int TransactionID) &&
+                                        byte.TryParse(Reader["TransactionState"].ToString(), out byte State) &&
+                                        int.TryParse(Reader["TransactionTotlePrice"].ToString(), out int TotolePrice) &&
+                                        int.TryParse(Reader["TransactionUserID"].ToString(), out int CustomerID) &&
+                                        Reader["TransactionPaymentMethodID"] != null && Reader["TransactionGUID"] != null)
+                                        
+                                {
+
+                                    Transaction.ID = TransactionID;
+                                    Transaction.PaymentMethodID = Reader["TransactionPaymentMethodID"].ToString();
+                                    Transaction.State = (DTOTransaction.enState)State;
+                                    Transaction.TotolePrice = TotolePrice;
+                                    Transaction.CustomerID = CustomerID;
+                                    Transaction.TransactionGUID = Reader["TransactionGUID"].ToString();
+
                                     return Transaction;
                                 }
 
@@ -175,11 +248,11 @@ namespace ConnectionLayer
         public static async Task<int> Add(DTOTransaction Transaction)
         {
 
-            string qery = @"insert into Transaction(TransactionPaymentMethodID,TransactionState ,TransactionTotolePrice,TransactionUserID,TransactionGUID)
+            string qery = @"insert into Transactions(TransactionPaymentMethodID,TransactionState ,TransactionTotlePrice,TransactionUserID,TransactionGUID)
 
-          values(@TransactionPaymentMethodID,@TransactionState,@TransactionTotolePrice,@TransactionUserID,@TransactionGUID)
+          values(@TransactionPaymentMethodID,@TransactionState,@TransactionTotlePrice,@TransactionUserID,@TransactionGUID)
         ;Select SCOPE_IDENTITY()";
-
+            
 
             try
             {
@@ -192,7 +265,7 @@ namespace ConnectionLayer
 
                         command.Parameters.AddWithValue("@TransactionPaymentMethodID", Transaction.PaymentMethodID);
                         command.Parameters.AddWithValue("@TransactionState", Transaction.State);
-                        command.Parameters.AddWithValue("@TransactionTotolePrice", Transaction.TotolePrice);
+                        command.Parameters.AddWithValue("@TransactionTotlePrice", Transaction.TotolePrice);
                         command.Parameters.AddWithValue("@TransactionUserID", Transaction.CustomerID);
                         command.Parameters.AddWithValue("@TransactionGUID", Guid.Parse(Transaction.TransactionGUID));
                       

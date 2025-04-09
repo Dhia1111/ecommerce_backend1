@@ -72,6 +72,60 @@
         }
       }
     },
+    "/api/Ecommerce/CustomerMangment/Payment": {
+      "post": {
+        "tags": [
+          "clsCustomerMangmentAPIs"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DTOPayment"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DTOPayment"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DTOPayment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/api/Ecommerce/ProductMangment/AddProduct": {
       "post": {
         "tags": [
@@ -732,31 +786,65 @@
       }
     },
     "/api/Ecommerce/LogInLogOut/LogOut": {
-      "get": {
+      "post": {
         "tags": [
           "Ecommerce"
         ],
         "operationId": "LogOut",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DTOCartItem"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DTOCartItem"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DTOCartItem"
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "boolean"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "boolean"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "boolean"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -851,6 +939,54 @@
   },
   "components": {
     "schemas": {
+      "DTOCartItem": {
+        "type": "object",
+        "properties": {
+          "cartID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "numberOfItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "productID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "imageURL": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DTOPayment": {
+        "type": "object",
+        "properties": {
+          "inCludedProductList": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DTOCartItem"
+            },
+            "nullable": true
+          },
+          "paymentMethodID": {
+            "type": "string",
+            "nullable": true
+          },
+          "personInf": {
+            "$ref": "#/components/schemas/DTOPerson"
+          }
+        },
+        "additionalProperties": false
+      },
       "DTOPerson": {
         "type": "object",
         "properties": {

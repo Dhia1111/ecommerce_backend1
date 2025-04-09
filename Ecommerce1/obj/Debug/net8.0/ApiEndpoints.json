@@ -55,6 +55,42 @@
     ]
   },
   {
+    "ContainingType": "clsCustomerMangmentAPIs",
+    "Method": "Payment",
+    "RelativePath": "api/Ecommerce/CustomerMangment/Payment",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "PaymentInf",
+        "Type": "DTOPayment",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 500
+      }
+    ]
+  },
+  {
     "ContainingType": "Ecommerce1.Controllers.EcommerceController",
     "Method": "IsLogedIn",
     "RelativePath": "api/Ecommerce/LogInLogOut/IsLogedIn",
@@ -161,19 +197,35 @@
     "ContainingType": "Ecommerce1.Controllers.EcommerceController",
     "Method": "LogOut",
     "RelativePath": "api/Ecommerce/LogInLogOut/LogOut",
-    "HttpMethod": "GET",
+    "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "CartItems",
+        "Type": "System.Collections.Generic.List\u00601[[DTOCartItem, ConnectionLayer, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": [
       {
-        "Type": "System.Boolean",
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
         "MediaTypes": [
           "text/plain",
           "application/json",
           "text/json"
         ],
-        "StatusCode": 200
+        "StatusCode": 400
+      },
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 500
       }
     ],
     "EndpointName": "LogOut"
