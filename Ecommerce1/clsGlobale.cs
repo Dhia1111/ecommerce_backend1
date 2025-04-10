@@ -1,5 +1,7 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using BusinessLayer;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
 
@@ -163,5 +165,41 @@ namespace Ecommerce1
             }
         }
 
+
+        public  static async Task<bool>SendEmail(clsUser User,string emailbody,string Subject,bool IsHtml)
+        {
+            try
+            {
+                
+
+                using SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587)
+                {
+                    Credentials = new System.Net.NetworkCredential(clsGlobale.GetEmail(), clsGlobale.GetEmailPassWord()),
+                    EnableSsl = true,
+                };
+
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(clsGlobale.GetEmail()),
+                    Subject = Subject,
+
+                    // make sure to create a valiad VerificationLink based on yor front end 
+
+                    Body = emailbody,
+
+                    IsBodyHtml = IsHtml,
+                };
+
+                mailMessage.To.Add(User.Person.Email);
+                await smtpClient.SendMailAsync(mailMessage);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\n\nError :\n" + ex);
+                return false;
+
+            }
+            return true;
+        }
     }
 }

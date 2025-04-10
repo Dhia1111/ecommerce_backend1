@@ -27,12 +27,43 @@ public class EcommerceController : ControllerBase
     public async Task<ActionResult<bool>> SignUp([FromBody] DTOUser User)
     {
         Response.Cookies.Delete("Authentication");
+        
 
         if (User == null) { return BadRequest("Invalaid User information"); }
         if (string.IsNullOrEmpty(User.Person.Email)) { return BadRequest("Invalaid User information(Email)"); }
         if (string.IsNullOrEmpty(User.UserName)) { return BadRequest("Invalaid User information(UserName)"); }
         if (string.IsNullOrEmpty(User.UserPassword)) { return BadRequest("Invalaid User information(PassWord) "); }
+        {
+            // Check if password length is exactly 9
+            if (User.UserPassword.Length != 9)
+                return BadRequest("Weak PassWord");
+
+            // Count letters and digits
+            int letterCount = 0;
+            int digitCount = 0;
+
+            foreach (char c in User.UserPassword)
+            {
+                if (char.IsLetter(c))
+                    letterCount++;
+                else if (char.IsDigit(c))
+                    digitCount++;
+            }
+
+            // Must have at least 2 letters and at least 2 digits
+            bool LetterOrDigetsLessThenTow= letterCount < 2 || digitCount < 2;
+
+            if (LetterOrDigetsLessThenTow)
+            {
+                return BadRequest("Weak PassWord");
+
+            }
+
+        }
+
+
         clsUser? user = await clsUser.Find(User.UserName);
+ 
         if (user != null)
         {
             return BadRequest("Select another user name ");
@@ -204,7 +235,7 @@ public class EcommerceController : ControllerBase
             return BadRequest("User name or PassWord Are incorect");
 
         }
-
+      
         var hasher = new PasswordHasher<object>();
 
         var VerifyhashedPassword = hasher.VerifyHashedPassword(null, ExsistedCustomer.PassWord, User.UserPassword);
@@ -212,6 +243,12 @@ public class EcommerceController : ControllerBase
         if (VerifyhashedPassword == PasswordVerificationResult.Failed)
         {
             return BadRequest("User name or PassWord Are incorect");
+
+        }
+
+        if (await clsValidatingEmail.Find(ExsistedCustomer.PersonID) != null)
+        {
+            return BadRequest("An Account Without a verfied email, please check your email for a verfication link then log in again");
 
         }
 

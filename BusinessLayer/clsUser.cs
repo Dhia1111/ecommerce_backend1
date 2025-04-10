@@ -22,7 +22,7 @@ namespace BusinessLayer
 
         public int PersonID { get; set; }
 
-        public clsPerson Peson{get{ return _Person ; } }
+        public clsPerson Person{get{ return _Person ; } }
         public string UserName { get; set; }
 
         public string PassWord {  get; set; }

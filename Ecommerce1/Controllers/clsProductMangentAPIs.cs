@@ -1,11 +1,10 @@
-﻿namespace Ecommerce1.Controllers;
+﻿
+namespace Ecommerce1.Controllers;
 using BusinessLayer;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.IO;
-
-
-
+using System.Net;
 
 public class DTOAddProductRequest
 {
@@ -45,8 +44,42 @@ public class clsProductMangentAPIs : ControllerBase
     [HttpPost("AddProduct")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    
     public async Task<ActionResult<bool>> AddProduct([FromForm] DTOAddProductRequest obj)
     {
+        if (Request.Cookies.TryGetValue("Authentication", out string token))
+        {
+            int? UserID = clsGlobale.ExtractUserIdFromToken(token);
+
+            if (UserID == null)
+            {
+                return StatusCode(500, "An unexpected server error occurred.");
+            }
+
+            else
+            {
+                clsUser? User =await clsUser.Find(UserID.Value);
+
+                if (User == null) return BadRequest("User Does not exsiste");
+
+                else
+                {
+                    if (!((((User.Atherization&(byte)DTOUser.enAtherizations.AddProduct)==(byte)DTOUser.enAtherizations.AddProduct)&&User.Role==DTOUser.enRole.User) || (User.Role == DTOUser.enRole.Admine)))
+                    {
+
+                        return BadRequest("User is Athorized");
+
+                    }
+                }
+                
+            }
+
+        }
+        else
+        {
+            return BadRequest("You need to log in ");
+        }
+
         if (obj.stProduct != null) obj.Product = JsonConvert.DeserializeObject<DTOProduct>(obj.stProduct);
 
         if (obj.stcatigories != null) obj.CatigoriesList = JsonConvert.DeserializeObject<List<DTOCatygory.enCatigories>?>(obj.stcatigories);
@@ -142,7 +175,40 @@ public class clsProductMangentAPIs : ControllerBase
     public async Task<ActionResult<bool>> UpdateProduct([FromForm] DTOAddProductRequest obj)
     {
 
+        if (Request.Cookies.TryGetValue("Authentication", out string token))
+        {
+            int? UserID = clsGlobale.ExtractUserIdFromToken(token);
+
+            if (UserID == null)
+            {
+                return StatusCode(500, "An unexpected server error occurred.");
+            }
+
+            else
+            {
+                clsUser? User = await clsUser.Find(UserID.Value);
+
+                if (User == null) return BadRequest("User Does not exsiste");
+
+                else
+                {
+                    if (!((((User.Atherization & (byte)DTOUser.enAtherizations.UpdateProduct) == (byte)DTOUser.enAtherizations.UpdateProduct) && User.Role == DTOUser.enRole.User) || (User.Role == DTOUser.enRole.Admine)))
+                    {
+
+                        return BadRequest("User is Athorized");
+
+                    }
+                }
+
+            }
+
+        }
+        else
+        {
+            return BadRequest("You need to log in ");
+        }
         bool result;
+
 
 
         if (obj.stProduct != null) obj.Product = JsonConvert.DeserializeObject<DTOProduct>(obj.stProduct);
@@ -276,6 +342,40 @@ public class clsProductMangentAPIs : ControllerBase
     public async Task<ActionResult<bool>> DeleteProduct([FromBody] int ProductID)
 
     {
+
+        if (Request.Cookies.TryGetValue("Authentication", out string token))
+        {
+            int? UserID = clsGlobale.ExtractUserIdFromToken(token);
+
+            if (UserID == null)
+            {
+                return StatusCode(500, "An unexpected server error occurred.");
+            }
+
+            else
+            {
+                clsUser? User = await clsUser.Find(UserID.Value);
+
+                if (User == null) return BadRequest("User Does not exsiste");
+
+                else
+                {
+                    if (!((((User.Atherization & (byte)DTOUser.enAtherizations.DeleteProduct) == (byte)DTOUser.enAtherizations.DeleteProduct) && User.Role == DTOUser.enRole.User) || (User.Role == DTOUser.enRole.Admine)))
+                    {
+
+                        return BadRequest("User is Athorized");
+
+                    }
+                }
+
+            }
+
+        }
+        else
+        {
+            return BadRequest("You need to log in ");
+        }
+
         clsProduct? product = await clsProduct.Find(ProductID);
         if (product==null)
         {
@@ -333,7 +433,39 @@ public class clsProductMangentAPIs : ControllerBase
     public async Task<ActionResult<List<DTOProduct>?>> GetAllProducts()
     
     {
-       
+        if (Request.Cookies.TryGetValue("Authentication", out string token))
+        {
+            int? UserID = clsGlobale.ExtractUserIdFromToken(token);
+
+            if (UserID == null)
+            {
+                return StatusCode(500, "An unexpected server error occurred.");
+            }
+
+            else
+            {
+                clsUser? User = await clsUser.Find(UserID.Value);
+
+                if (User == null) return BadRequest("User Does not exsiste");
+
+                else
+                {
+                    if (!((((User.Atherization & (byte)DTOUser.enAtherizations.ShowProductList) == (byte)DTOUser.enAtherizations.ShowProductList) && User.Role == DTOUser.enRole.User) || (User.Role == DTOUser.enRole.Admine)))
+                    {
+
+                        return BadRequest("User is Athorized");
+
+                    }
+                }
+
+            }
+
+        }
+        else
+        {
+            return BadRequest("You need to log in ");
+        }
+
         List<DTOProduct>? list = await clsProduct.GetAll();
 
         if (list != null)
@@ -355,8 +487,6 @@ public class clsProductMangentAPIs : ControllerBase
     [HttpGet("GetAllProductsForCatigory/{CatigoryID}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-
-
     public async Task<ActionResult<List<DTOProduct>?>> GetAllProductsForCatigory(DTOCatygory.enCatigories CatigoryID)
 
     {

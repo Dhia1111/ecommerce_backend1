@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 public class DTOUser
 {
-    public enum enAtherizations { AddUser = 2, UpdateUser = 4, DeleteHisAccount = 16, DeleteUsers = 8, MakeTransaction = 1 }
+    public enum enAtherizations { MakeTransaction = 1, AddUser = 2, UpdateUser = 4,  DeleteUsers = 8, DeleteHisAccount = 16,AddProduct=32,UpdateProduct=64,DeleteProduct=128,ShowProductList=254 }
     public enum enRole { Admine = 1, Customer = 2, User = 3 }
 
 

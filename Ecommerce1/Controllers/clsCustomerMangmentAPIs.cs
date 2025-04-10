@@ -182,8 +182,9 @@ public class clsCustomerMangmentAPIs : ControllerBase
 
                 if (Transaction != null)
                 {
-
-                    return BadRequest(new { status = "not set", message = "\"the transaction is in process please wait ", ErrorType = "double pay" });
+                 await   clsGlobale.SendEmail(User, "the transaction is in process please wait", "Processing the transaction", false);
+                
+                 return BadRequest(new { status = "not set", message = "\"the transaction is in process please wait ", ErrorType = "double pay" });
 
                 }
 
@@ -198,13 +199,13 @@ public class clsCustomerMangmentAPIs : ControllerBase
         //Update PersonInf
 
         if (PaymentInf.PersonInf != null) { 
-            User.Peson.PostCode = PaymentInf.PersonInf.PostCode;   
-            User.Peson.FirstName = PaymentInf.PersonInf.FirstName;
-            User.Peson.LastName = PaymentInf.PersonInf.LastName;
-            User.Peson.City = PaymentInf.PersonInf.City;
-            User.Peson.Country = PaymentInf.PersonInf.Country;
-            User.Peson.Phone = PaymentInf.PersonInf.Phone;
-            if (!await User.Peson.Save())
+            User.Person.PostCode = PaymentInf.PersonInf.PostCode;   
+            User.Person.FirstName = PaymentInf.PersonInf.FirstName;
+            User.Person.LastName = PaymentInf.PersonInf.LastName;
+            User.Person.City = PaymentInf.PersonInf.City;
+            User.Person.Country = PaymentInf.PersonInf.Country;
+            User.Person.Phone = PaymentInf.PersonInf.Phone;
+            if (!await User.Person.Save())
             {
                 return StatusCode(500,new { status = "Not Set", message = "Field to save Person Information", ErrorType = "filed" });
             }
@@ -218,6 +219,7 @@ public class clsCustomerMangmentAPIs : ControllerBase
             UpdatingCart = await User.UpdateToCart(item);
             if (!UpdatingCart)
             {
+                await clsGlobale.SendEmail(User, "We Could not handle the Cart Pleas try again later", "Processing the transaction", false);
                 return StatusCode(500, new { status = "Not Set", message = "Handling Save Error", ErrorType = "null requests" });
             }
         }
@@ -255,8 +257,9 @@ public class clsCustomerMangmentAPIs : ControllerBase
             if (!await NewTransaction.Save())
             {
 
+            await clsGlobale.SendEmail(User, "We Could not Create a new transaction for you please try again later", "Processing the transaction", false);
 
-                return StatusCode(500, new { status = "Not Set", message = "\"the server is experiencing an internal problem wich can't store the transaction pleas try again!!!", ErrorType = "Saving error" });
+            return StatusCode(500, new { status = "Not Set", message = "\"the server is experiencing an internal problem wich can't store the transaction pleas try again!!!", ErrorType = "Saving error" });
 
 
             }
@@ -277,7 +280,7 @@ public class clsCustomerMangmentAPIs : ControllerBase
                     Currency = "usd",
                     PaymentMethod = PaymentInf.PaymentMethodID,
                     Confirm = true,
-                    ReceiptEmail = User.Peson.Email,
+                    ReceiptEmail = User.Person.Email,
                     AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
                     {
                         Enabled = true,
@@ -307,7 +310,9 @@ public class clsCustomerMangmentAPIs : ControllerBase
                 }
                 else
                 {
-                    return StatusCode(500, new { stuts = "Not set", message = "the Payment Completed secsessfuly but you need to log in again due to server error", ErrorType = "Cookie Genrating error" });
+                await clsGlobale.SendEmail(User, "the Payment Completed secsessfuly but you need to log in again due to server error", "Processing the Payment", false);
+
+                return StatusCode(500, new { stuts = "Not set", message = "the Payment Completed secsessfuly but you need to log in again due to server error", ErrorType = "Cookie Genrating error" });
 
                 }
                             
@@ -322,20 +327,23 @@ public class clsCustomerMangmentAPIs : ControllerBase
                 //ClearPendingPaymentCart 
                 if(!await User.ClearCart())
                 {
+                    await clsGlobale.SendEmail(User, "the payment is Complited secsessfuly and the product is in order ,but do not purshs any thing and log out then log in antile the Cart is Clear", "Processing the Payment", false);
+
                     return StatusCode(500,new { stuts = "", message = "the payment is Complited secsessfuly and the product is in order ,but do not purshs any thing and log out then log in antile the Cart is Clear", ErrorType = "Connection cut or  overLoaded server" });
 
                 }
                 await PendingPayment.Save();
 
             }
-            
+
 
             //Send OrderInformation to your seplayer 
 
             //and Email to the Client
 
+            await clsGlobale.SendEmail(User, "the Payment Completed secsessfuly", "Processing the Payment", false);
 
-                return Ok(new { stuts = "Ok", message = "the Payment Completed secsessfuly", ErrorType = "" });
+            return Ok(new { stuts = "Ok", message = "the Payment Completed secsessfuly", ErrorType = "" });
             }
 
             catch (StripeException ex)
