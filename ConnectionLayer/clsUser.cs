@@ -76,14 +76,13 @@ namespace ConnectionLayer
                                 DTOUser User = new DTOUser(-1,-1, 0, 0, "", "", "");
 
 
-                                if ((int.TryParse(Reader["UserID"].ToString(), out int UserID) &&
-                                    int.TryParse(Reader["PersonID"].ToString(), out int PersonID) &&
-                                    byte.TryParse(Reader["UserRole"].ToString(), out byte UserRole) &&
-                                     byte.TryParse(Reader["PersonID"].ToString(), out byte UserAtherization) &&
-                                    Reader["UserName"] != null &&
-                                    Reader["UserPassWord"] != null &&
-                                    Reader["CreateAT"] != null  ))
-                                {
+                                if ( int.TryParse(Reader["UserID"].ToString(), out int UserID) &&
+                                     int.TryParse(Reader["PersonID"].ToString(), out int PersonID) &&
+                                     byte.TryParse(Reader["UserRole"].ToString(), out byte UserRole) &&
+                                     byte.TryParse(Reader["UserAtherization"].ToString(), out byte UserAtherization) &&
+                                     (Reader["UserName"] != null) &&
+                                     (Reader["UserPassWord"] != null) &&
+                                     (Reader["CreateAT"] != null )){
 
                                     User.UserID = UserID;
                                     User.PersonID = PersonID;
@@ -157,7 +156,7 @@ namespace ConnectionLayer
                                 if ((int.TryParse(Reader["UserID"].ToString(), out int UserID) &&
                                     int.TryParse(Reader["PersonID"].ToString(), out int PersonID) &&
                                     byte.TryParse(Reader["UserRole"].ToString(), out byte UserRole) &&
-                                     byte.TryParse(Reader["PersonID"].ToString(), out byte UserAtherization) &&
+                                     byte.TryParse(Reader["UserAtherization"].ToString(), out byte UserAtherization) &&
                                     Reader["UserName"] != null &&
                                     Reader["UserPassWord"] != null &&
                                     Reader["CreateAT"] != null))

@@ -1,6 +1,7 @@
 ﻿
 namespace Ecommerce1.Controllers;
 using BusinessLayer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.IO;
@@ -430,6 +431,7 @@ public class clsProductMangentAPIs : ControllerBase
     [HttpGet("GetAllProducts")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<List<DTOProduct>?>> GetAllProducts()
     
     {
@@ -446,14 +448,14 @@ public class clsProductMangentAPIs : ControllerBase
             {
                 clsUser? User = await clsUser.Find(UserID.Value);
 
-                if (User == null) return BadRequest("User Does not exsiste");
+                if (User == null) return StatusCode(500, "User Does not exsiste");
 
                 else
                 {
                     if (!((((User.Atherization & (byte)DTOUser.enAtherizations.ShowProductList) == (byte)DTOUser.enAtherizations.ShowProductList) && User.Role == DTOUser.enRole.User) || (User.Role == DTOUser.enRole.Admine)))
                     {
 
-                        return BadRequest("User is Athorized");
+                        return BadRequest("User is an Athorized");
 
                     }
                 }
@@ -484,6 +486,7 @@ public class clsProductMangentAPIs : ControllerBase
     }
 
 
+
     [HttpGet("GetAllProductsForCatigory/{CatigoryID}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -505,6 +508,49 @@ public class clsProductMangentAPIs : ControllerBase
 
 
         return Ok(list);
+
+    }
+
+
+    [HttpGet("IsUserAtherized", Name = "IsUserAtherized")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<bool>> IsUserAtherized()
+    {
+        //in this stage  i only let the type of operation is binary all or none 
+        //in the  futer i can update it to more roles and Atherization types 
+
+        if (Request.Cookies.TryGetValue("Authentication", out string token))
+        {
+            int? UserID = clsGlobale.ExtractUserIdFromToken(token);
+
+            if (UserID == null)
+            {
+                return StatusCode(500, "An unexpected server error occurred.");
+            }
+
+            else
+            {
+                clsUser? user = await clsUser.Find(UserID.Value);
+                if (user != null)
+                {
+                    if (user.Role==DTOUser.enRole.Admine)
+                    {
+                        return Ok(true);
+
+                    }
+                }
+                else
+                {
+                    
+
+                    return Ok(false);
+                }
+            }
+        }
+
+        return Ok(false);
+
 
     }
 
