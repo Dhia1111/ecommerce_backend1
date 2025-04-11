@@ -36,7 +36,7 @@ public class EcommerceController : ControllerBase
         {
             // Check if password length is exactly 9
             if (User.UserPassword.Length < 9)
-                return BadRequest("Weak PassWord");
+                return BadRequest("Weak PassWord length should be more then 9");
 
             // Count letters and digits
             int letterCount = 0;
