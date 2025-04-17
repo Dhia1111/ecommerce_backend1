@@ -364,7 +364,7 @@ namespace ConnectionLayer
                         command.Parameters.AddWithValue("@UserAtherization", User.UserAtherization);
                         command.Parameters.AddWithValue("@UserName", User.UserName);
                         command.Parameters.AddWithValue("@UserPassWord", User.UserPassword);
-                        command.Parameters.AddWithValue("@CreateAt", User.CreatedAt);
+                        command.Parameters.AddWithValue("@CreateAt", DateTime.Now);
 
 
 
