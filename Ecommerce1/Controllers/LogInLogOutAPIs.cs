@@ -158,15 +158,14 @@ public class EcommerceController : ControllerBase
     </head>
     <body>
         <div class='email-container'>
-            <h2>Welcome to Our Platform</h2>
+            <h2>Welcome to DEPhone</h2>
             <p>Thank you for signing up! Please verify your email by clicking the button below:</p>
             <a class='btn email-link' href='{clsGlobale.GetVerifyEmailLink()}?token={NewGUID_ID.ToString()}'>Verify Email</a>
-            <p class='footer'>If you have any questions, contact our support team at 
-                <a href='mailto:support@example.com'>support@example.com</a> or <strong>DEPhone: +123456789</strong>
-            </p>
+          
         </div>
     </body>
     </html>";
+
 
                 using SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587)
                 {

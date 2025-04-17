@@ -7,14 +7,15 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using System.Net;
 using Microsoft.Extensions.FileProviders;
+using Ecommerce1;
 
 
 
 
- 
+
 var builder = WebApplication.CreateBuilder(args);
 
-string SecretKey = builder.Configuration["AppSettings:JWT_SECRET"];
+string SecretKey = clsGlobale.GetJwtSecret();//builder.Configuration["JWT_SECRET"];
 if (SecretKey == null) throw new Exception("Could not Create services due to Invaliad information ");
 builder.Services.AddEndpointsApiExplorer();
 
@@ -35,13 +36,13 @@ builder.Services.AddSwaggerGen();
 //    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);  // Set the expiration time
 //    options.Cookie.SameSite = SameSiteMode.None;
 //    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-   
+
 
 //}).
 
 //AddJwtBearer(options =>
 //{
-    
+
 //    options.RequireHttpsMetadata = false; // Set true in production
 //    options.SaveToken = true;
 //    options.TokenValidationParameters = new TokenValidationParameters
@@ -58,30 +59,30 @@ builder.Services.AddSwaggerGen();
 
 
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowReactApp", policy =>
-    {
-        policy.WithOrigins("https://firstecommerceforntend.netlify.app")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-
-    });
-});
-
-
 //builder.Services.AddCors(options =>
 //{
 //    options.AddPolicy("AllowReactApp", policy =>
 //    {
-//        policy.WithOrigins("https://localhost:3000")
+//        policy.WithOrigins("https://firstecommerceforntend.netlify.app")
 //              .AllowAnyHeader()
 //              .AllowAnyMethod()
 //              .AllowCredentials();
 
 //    });
 //});
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("https://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+
+    });
+});
 
 
 

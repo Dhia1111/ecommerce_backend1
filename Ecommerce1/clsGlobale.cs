@@ -12,14 +12,14 @@ namespace Ecommerce1
     {
         private static readonly HttpClient client = new HttpClient();
 
-        private static readonly IConfigurationRoot _configuration;
+        private static readonly IConfiguration _configuration;
 
         // Static constructor to initialize the configuration
         static clsGlobale()
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
+                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true).AddEnvironmentVariables();
 
             _configuration = builder.Build();
         }
@@ -27,7 +27,7 @@ namespace Ecommerce1
         // Method to retrieve values
         public static string GetJwtSecret()
         {
-            return _configuration["AppSettings:JWT_SECRET"];
+            return _configuration["JWT_SECRET"];
         }
         public static string GetTheBestImageExtention()
         {
@@ -35,7 +35,7 @@ namespace Ecommerce1
         }
         public static string GetStripSecret()
         {
-            return _configuration["AppSettings:stripeSecretKey"];
+            return _configuration["stripeSecretKey"];
         }
 
         public static string SetImageURL(string ImageName)

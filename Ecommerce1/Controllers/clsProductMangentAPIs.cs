@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.IO;
 using System.Net;
+using static DTOCatygory;
 
 public class DTOAddProductRequest
 {
@@ -48,6 +49,7 @@ public class clsProductMangentAPIs : ControllerBase
     
     public async Task<ActionResult<bool>> AddProduct([FromForm] DTOAddProductRequest obj)
     {
+        //return BadRequest("");
         if (Request.Cookies.TryGetValue("Authentication", out string token))
         {
             int? UserID = clsGlobale.ExtractUserIdFromToken(token);
@@ -85,14 +87,32 @@ public class clsProductMangentAPIs : ControllerBase
 
         if (obj.stcatigories != null) obj.CatigoriesList = JsonConvert.DeserializeObject<List<DTOCatygory.enCatigories>?>(obj.stcatigories);
 
+        if(obj.Product == null)
+        {
+            return BadRequest("Provied a valiad data the  Product   is empty");
 
+        }
+        if (obj.CatigoriesList == null )
+        {
+            return BadRequest("Provied a valiad data the  catigories list is empty");
+        }
+        if (obj.CatigoriesList.Count == 0)
+        {
+            return BadRequest("Provied a valiad data the  catigories list is empty");
+        }
         bool result = false;
         //handle image and save it in the image file
-
         if (obj.Image == null || obj.Image.Length == 0)
         {
             return BadRequest("the Image is not valaid ");
         }
+
+        var extension = Path.GetExtension(obj.Image.FileName).ToLowerInvariant();
+
+        var permittedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
+
+        if (!permittedExtensions.Contains(extension))
+            return BadRequest("Invalid file extension,pleas provied an image file");
 
         if (obj.Product.Price <= 0)
         {
@@ -101,15 +121,11 @@ public class clsProductMangentAPIs : ControllerBase
 
         }
 
-        if (obj.stcatigories.Length == 0)
-        {
-            return BadRequest("You must send aat lest one Catigory ");
-        }
-
+      
 
         if (string.IsNullOrEmpty(obj.Product.Name))
         {
-            return BadRequest("the Image is not valaid ");
+            return BadRequest("the Product name is  anvalaid ");
 
 
         }
@@ -216,15 +232,27 @@ public class clsProductMangentAPIs : ControllerBase
 
         if (obj.stcatigories != null) obj.CatigoriesList = JsonConvert.DeserializeObject<List<DTOCatygory.enCatigories>?>(obj.stcatigories);
 
-
-        //handle image and save it in the image file
-
-        
-
+        if (obj.CatigoriesList == null || obj.CatigoriesList.Count == 0) return BadRequest("you need to provied Catigories");
+    
         if (obj.Product == null)
         {
             return BadRequest("You need to provied product information : price, name... ");
         }
+        //handle image and save it in the image file
+
+
+
+        if (obj.Image != null && obj.Image.Length == 0)
+        {
+            var extension = Path.GetExtension(obj.Image.FileName).ToLowerInvariant();
+
+            var permittedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
+
+            if (!permittedExtensions.Contains(extension))
+                return BadRequest("Invalid file extension,pleas provied an image file");
+        }
+
+     
         if (obj.Product.Price <= 0)
         {
             return BadRequest("the ProductPrice must be more the (0) ");
@@ -232,7 +260,6 @@ public class clsProductMangentAPIs : ControllerBase
 
         }
 
-        if (obj.CatigoriesList == null||obj.CatigoriesList.Count==0) return BadRequest("you need to provied Catigories");
 
  
 
@@ -390,11 +417,7 @@ public class clsProductMangentAPIs : ControllerBase
     
 
        bool result= await product.ClearCatigories();
-        if (!result) {
 
-            return StatusCode(500, "An unexpected server error occurred.");
-
-        }
         product = null;
       result=  await clsProduct.Delete(ProductID);
 

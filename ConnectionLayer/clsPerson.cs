@@ -55,11 +55,11 @@ namespace ConnectionLayer
         {
             var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
+            .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true).AddEnvironmentVariables();
 
             _configuration = builder.Build();
 
-            var st = _configuration["ConnectionSetting:Defualt"];
+            var st = _configuration["ConnectionSetting"];
            if (!string.IsNullOrEmpty(st)) ConnectionString =st ;
         }
     }
