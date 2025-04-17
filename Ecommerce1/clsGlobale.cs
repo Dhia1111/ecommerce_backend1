@@ -8,9 +8,9 @@ using System.Text.Json;
 
 namespace Ecommerce1
 {
+
     public static class clsGlobale
     {
-        private static readonly HttpClient client = new HttpClient();
 
         private static readonly IConfiguration _configuration;
 
@@ -40,7 +40,7 @@ namespace Ecommerce1
 
         public static string SetImageURL(string ImageName)
         {
-            return _configuration["ImagesUrl"].ToString()+ImageName;
+            return _configuration["ImagesUrl"].ToString() + ImageName;
         }
 
         public static string GetEmail()
@@ -65,6 +65,42 @@ namespace Ecommerce1
         public static string? ConectionString()
         {
             return _configuration["ConnectionString"];
+        }
+
+        public static async Task<bool> SendEmail(clsUser User, string emailbody, string Subject, bool IsHtml)
+        {
+            try
+            {
+
+
+                using SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587)
+                {
+                    Credentials = new System.Net.NetworkCredential(clsGlobale.GetEmail(), clsGlobale.GetEmailPassWord()),
+                    EnableSsl = true,
+                };
+
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(clsGlobale.GetEmail()),
+                    Subject = Subject,
+
+                    // make sure to create a valiad VerificationLink based on yor front end 
+
+                    Body = emailbody,
+
+                    IsBodyHtml = IsHtml,
+                };
+
+                mailMessage.To.Add(User.Person.Email);
+                await smtpClient.SendMailAsync(mailMessage);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\n\nError :\n" + ex);
+                return false;
+
+            }
+            return true;
         }
 
         public static string? GenerateJwtToken(DTOUser user)
@@ -111,7 +147,6 @@ namespace Ecommerce1
             return tokenHandler.WriteToken(token);
         }
 
-        // **New method to extract UserID from a token**
 
         public static int? ExtractUserIdFromToken(string token)
         {
@@ -173,85 +208,17 @@ namespace Ecommerce1
             }
         }
 
-
-        public  static async Task<bool>SendEmail(clsUser User,string emailbody,string Subject,bool IsHtml)
+        public  static string BaseGeoNameUrl()
         {
-            try
-            {
-                
-
-                using SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587)
-                {
-                    Credentials = new System.Net.NetworkCredential(clsGlobale.GetEmail(), clsGlobale.GetEmailPassWord()),
-                    EnableSsl = true,
-                };
-
-                var mailMessage = new MailMessage
-                {
-                    From = new MailAddress(clsGlobale.GetEmail()),
-                    Subject = Subject,
-
-                    // make sure to create a valiad VerificationLink based on yor front end 
-
-                    Body = emailbody,
-
-                    IsBodyHtml = IsHtml,
-                };
-
-                mailMessage.To.Add(User.Person.Email);
-                await smtpClient.SendMailAsync(mailMessage);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("\n\nError :\n" + ex);
-                return false;
-
-            }
-            return true;
+            return _configuration["baseGeoNameUrl"]; 
         }
+        public static string GetgeonamesUserName() { return _configuration["geonamesUserName"]; }
+
+ 
+  
 
 
-       static string _GetTextUntilTheFirstSpace(string Text)
-        {
-            string text = "";
-            foreach (char c in Text)
-            {
-                if (char.IsWhiteSpace(c)) return text;
-                text += c;
-            }
-            return text;
-        }
-
-
-        public static async Task<bool> ValidateLocationAsync(string postalCode, string city, string countryCode)
-        {
-            string username = _configuration["geonamesUserName"];
-            var url = $"http://api.geonames.org/postalCodeSearchJSON?postalcode={postalCode}&placename={city}&country={countryCode}&username={username}";
-            var response = await client.GetAsync(url);
-
-            if (!response.IsSuccessStatusCode)
-                return false;
-
-            var content = await response.Content.ReadAsStringAsync();
-            using var jsonDoc = JsonDocument.Parse(content);
-            var root = jsonDoc.RootElement;
-
-            if (root.TryGetProperty("postalCodes", out JsonElement postalCodes) && postalCodes.GetArrayLength() > 0)
-            {
-                foreach (var place in postalCodes.EnumerateArray())
-                {
-                    if (place.TryGetProperty("placeName", out JsonElement placeName) &&
-                    _GetTextUntilTheFirstSpace(placeName.GetString())?.Equals(city, StringComparison.OrdinalIgnoreCase) == true)
-                    {
-                        return true; // Match found
-                    }
-                }
-            }
-
-            return false; // No match
-        }
+     
     }
-
-
 }
 

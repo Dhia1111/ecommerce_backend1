@@ -145,11 +145,12 @@ namespace ConnectionLayer
                                 if (
                                         int.TryParse(Reader["TransactionID"].ToString(), out int TransactionID) &&
                                         byte.TryParse(Reader["TransactionState"].ToString(), out byte State) &&
-                                        int.TryParse(Reader["TransactionTotlePrice"].ToString(), out int TotolePrice) &&
+                                        decimal.TryParse(Reader["TransactionTotlePrice"].ToString(), out decimal TotolePrice) &&
                                         int.TryParse(Reader["TransactionUserID"].ToString(), out int CustomerID) &&
                                         Reader["TransactionPaymentMethodID"] != null &&
                                         Reader["TransactionGUID"] != null&& 
-                                        Reader["Date"] != null)
+                                        Reader["Date"] != null
+                                        )
                                         
                                 {
 
@@ -322,12 +323,12 @@ namespace ConnectionLayer
                        
               TransactionPaymentMethodID=  @TransactionPaymentMethodID,
               TransactionState=   @TransactionState,
-              TransactionTotolePrice=      @TransactionTotolePrice,
+              TransactionTotlePrice=      @TransactionTotlePrice,
               TransactionUserID=      @TransactionUserID,
-              TransactionGUID=    @TransactionGUID,
+              TransactionGUID=    @TransactionGUID
               
 
-where TransactionD=@TransactionID";
+where TransactionID=@TransactionID";
 
 
             try
@@ -341,10 +342,10 @@ where TransactionD=@TransactionID";
 
                         command.Parameters.AddWithValue("@TransactionID", Transaction.ID);
                         command.Parameters.AddWithValue("@TransactionUserID", Transaction.CustomerID);
-                        command.Parameters.AddWithValue("@TransactionState", Transaction.State);
-                        command.Parameters.AddWithValue("@TransactionTotolePrice", Transaction.TotolePrice);
+                        command.Parameters.AddWithValue("@TransactionState", (int) Transaction.State);
+                        command.Parameters.AddWithValue("@TransactionTotlePrice", Transaction.TotolePrice);
                         command.Parameters.AddWithValue("@TransactionGUID", Guid.Parse(Transaction.TransactionGUID));
-                        command.Parameters.AddWithValue("@TransactionPaymentMehodID", Transaction.PaymentMethodID);
+                        command.Parameters.AddWithValue("@TransactionPaymentMethodID", Transaction.PaymentMethodID);
                        
 
                         int NumberRowAffected = await command.ExecuteNonQueryAsync();

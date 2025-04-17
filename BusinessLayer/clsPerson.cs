@@ -114,9 +114,6 @@ namespace BusinessLayer
         }
 
 
-        public static async Task<string?>GetCountryCode(string CountryName)
-        {
-            return await ConnectionLayer.clsPerson.GetCountryCode(CountryName);
-        }
+      
     }
 }

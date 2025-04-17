@@ -46,23 +46,7 @@ public class DTOPerson
 
 namespace ConnectionLayer
 {
-  static  class  clsConnectionGenral
-    {
 
-         public static string ConnectionString  = "";
-        private static IConfiguration _configuration;
-        static clsConnectionGenral()
-        {
-            var builder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true).AddEnvironmentVariables();
-
-            _configuration = builder.Build();
-
-            var st = _configuration["ConnectionSetting"];
-           if (!string.IsNullOrEmpty(st)) ConnectionString =st ;
-        }
-    }
     public static class clsPerson
     {
 
@@ -370,39 +354,6 @@ where PersonID=@PersonID";
 
             return true;
 
-        }
-
-
-        public static async Task<string?> GetCountryCode(string countryName)
-        {
-            string query = "SELECT top 1  CountryCode FROM Countries WHERE CountryName = @CountryName";
-            string ?countryCode = "";
-
-            using (SqlConnection connection = new SqlConnection(clsConnectionGenral.ConnectionString))
-            using (SqlCommand command = new SqlCommand(query, connection))
-            {
-                command.Parameters.AddWithValue("@CountryName", countryName);
-
-                try
-                {
-                    connection.Open();
-                    object? result =await command.ExecuteScalarAsync();
-
-                    if (result != null && result != DBNull.Value)
-                    {
-                        countryCode = result.ToString();
-
-                        return countryCode;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // Handle exception or rethrow
-                    Console.WriteLine($"Error: {ex.Message}");
-                }
-            }
-
-            return null;
         }
 
 
