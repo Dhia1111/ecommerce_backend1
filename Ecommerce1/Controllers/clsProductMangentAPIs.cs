@@ -46,7 +46,8 @@ public class clsProductMangentAPIs : ControllerBase
     [HttpPost("AddProduct")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+
     public async Task<ActionResult<bool>> AddProduct([FromForm] DTOAddProductRequest obj)
     {
         if (Request.Cookies.TryGetValue("Authentication", out string token))
@@ -120,7 +121,13 @@ public class clsProductMangentAPIs : ControllerBase
 
         }
 
-      
+        if (!clsValidation.IsValidDecimal(obj.Product.Price) )
+        {
+            return BadRequest(new DTOGeneralResponse("the ProductPrice decimal part should be less then tow Numbers (2.22) not 2(.221) ", 400, "Saving failure"));
+
+
+        }
+
 
         if (string.IsNullOrEmpty(obj.Product.Name))
         {
@@ -181,6 +188,8 @@ public class clsProductMangentAPIs : ControllerBase
     [HttpPost("UpdateProduct")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+
     public async Task<ActionResult<bool>> UpdateProduct([FromForm] DTOAddProductRequest obj)
     {
 
@@ -252,8 +261,16 @@ public class clsProductMangentAPIs : ControllerBase
 
         }
 
+        if (!clsValidation.IsValidDecimal(obj.Product.Price))
+        {
+            return BadRequest(new DTOGeneralResponse("the ProductPrice decimal part should be less then tow Numbers (2.22) not 2(.221) ", 400, "Saving failure"));
 
- 
+
+        }
+
+
+
+
 
         clsProduct? product = await clsProduct.Find(obj.Product.ID);
 
@@ -349,6 +366,7 @@ public class clsProductMangentAPIs : ControllerBase
     [HttpPost("DeleteProduct")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
     public async Task<ActionResult<bool>> DeleteProduct([FromBody] int ProductID)
     {

@@ -69,6 +69,21 @@ namespace Ecommerce1
 
         }
 
+       public static bool IsValidDecimal(decimal Number)
+        {
 
+            string input = Number.ToString();
+            
+            if (decimal.TryParse(input, out var number))
+            {
+                var parts = input.Split('.');
+                if (parts.Length == 2)
+                {
+                    return parts[1].Length <= 2;
+                }
+                return true; // No decimal part
+            }
+            return false; // Not a valid decimal
+        }
     }
 }

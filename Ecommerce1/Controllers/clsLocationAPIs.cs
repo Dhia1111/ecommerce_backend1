@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Stripe.V2;
 using System.Text.Json;
 using static System.Net.WebRequestMethods;
+using System.Net;
+using System.Net.Http;
+using System.Diagnostics.Metrics;
 
 
 [Route("api/Ecommerce/clsLocationAPIs")]
@@ -18,7 +21,29 @@ using static System.Net.WebRequestMethods;
 
 public class clsLocationAPIs : ControllerBase
 {
-    private static readonly HttpClient _httpClient = new HttpClient();
+
+
+    private IHttpClientFactory _httpClientFactory;
+
+    public clsLocationAPIs(IHttpClientFactory clientFactory)
+    {
+        _httpClientFactory = clientFactory;
+    }
+
+    [HttpGet("test-tls")]
+    public async Task<IActionResult> TestTls()
+    {
+        try
+        {
+            var client = _httpClientFactory.CreateClient("GeoClient");
+            var response = await client.GetAsync($"timezoneJSON?lat=47.01&lng=10.2&username={clsGlobale.GetgeonamesUserName()}");
+            return Ok(await response.Content.ReadAsStringAsync());
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Connection failed: {ex.Message}");
+        }
+    } 
 
     [HttpGet("GetCounties")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -42,26 +67,28 @@ public class clsLocationAPIs : ControllerBase
 
     public async Task<ActionResult<List<string>?>> GetAllCities(string CountryName)
     {
-        int Counter = 0;
+
+        var client = _httpClientFactory.CreateClient("GeoClient");
+
+
 
         string? CountryCoude = await clsLocation.GetCountryCode(CountryName);
 
         if (CountryCoude == null)
         {
+
             return BadRequest(new DTOGeneralResponse("Invalid Country Name", 400, "Serch failer"));
+       
         }
 
 
 
-         string baseUrl = clsGlobale.BaseGeoNameUrl();
 
         try
         {
-            // Build request URL
-            var url = $@"{baseUrl}?country={(CountryCoude)}&orderby=population& &featureClass=P&maxRows=900&username={clsGlobale.GetgeonamesUserName()}";
 
-            using var response = await _httpClient.GetAsync(url);
 
+            using var response = await client.GetAsync($"searchJSON?&country={(CountryCoude)}&orderby=population&featureClass=P&maxRows=900&username={clsGlobale.GetgeonamesUserName()}");
             if (!response.IsSuccessStatusCode)
             {
                 return StatusCode(500, new DTOGeneralResponse(
@@ -93,7 +120,7 @@ public class clsLocationAPIs : ControllerBase
                 if (element.TryGetProperty("toponymName", out var toponymElement))
                 {
                     var name = toponymElement.GetString();
-                    if (!string.IsNullOrEmpty(name)) { names.Add(name); Counter++; }
+                    if (!string.IsNullOrEmpty(name)) { names.Add(name);  }
                 }
             }
 
@@ -136,6 +163,8 @@ public class clsLocationAPIs : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<List<string>?>> GetPostCodes(string CountryName, string CityName)
     {
+        var client = _httpClientFactory.CreateClient("GeoClient");
+
         CityName = CityName.Replace(" City", "").Trim();
         string? countryCode = await clsLocation.GetCountryCode(CountryName);
 
@@ -144,13 +173,11 @@ public class clsLocationAPIs : ControllerBase
             return BadRequest(new DTOGeneralResponse("Invalid Country Name", 400, "SearchFailure"));
         }
 
-         string baseUrl = clsGlobale.BaseGeoNameUrl();
 
         try
         {
-            var url = $@"{baseUrl}?placename={(CityName)}&country={(countryCode)}&orderby=population&maxRows=100&username={clsGlobale.GetgeonamesUserName()}";
 
-            using var response = await _httpClient.GetAsync(url);
+            using var response = await client.GetAsync($"findNearbyPostalCodesJSON?placename={CityName}&country={countryCode}&maxRows=100&orderby=population&username={clsGlobale.GetgeonamesUserName()}");
 
             if (!response.IsSuccessStatusCode)
             {

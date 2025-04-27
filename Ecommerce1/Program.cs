@@ -15,11 +15,26 @@ using Ecommerce1;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string SecretKey = clsGlobale.GetJwtSecret();//builder.Configuration["JWT_SECRET"];
+string SecretKey = clsGlobale.GetJwtSecret();
 if (SecretKey == null) throw new Exception("Could not Create services due to Invaliad information ");
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
+
+
+//set TSL configuration 
+builder.Services.AddHttpClient("GeoClient", client => { 
+    client.BaseAddress = new Uri(clsGlobale.BaseGeoNameUrl());
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("MyApp/1.0");
+
+})
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        SslProtocols = System.Security.Authentication.SslProtocols.Tls12
+                      | System.Security.Authentication.SslProtocols.Tls13,
+        // For testing ONLY - remove in production
+        ServerCertificateCustomValidationCallback = (msg, cert, chain, errors) => true
+    });
 
 
 //builder.Services.AddAuthentication((option) =>
@@ -107,12 +122,9 @@ app.UseStaticFiles(new StaticFileOptions
         Path.Combine(app.Environment.ContentRootPath, "images")), // Adjust path as needed
     RequestPath = "/images"
 });
-
-
 app.UseRouting();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseCors("AllowReactApp");
 app.MapControllers();
-
 app.Run();
