@@ -228,6 +228,7 @@ public class EcommerceController : ControllerBase
     }
 
 
+
     [HttpPost("LogIn", Name = "LogIn")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -283,13 +284,25 @@ public class EcommerceController : ControllerBase
         };
 
         var AthorizationToken = clsGlobale.GenerateJwtToken(ExsistedCustomer.DTOUser);
-        var GuidIDToken=clsGlobale.GenerateJwtToken(Guid.NewGuid());
-   
-        
-        if (!string.IsNullOrEmpty(AthorizationToken)&&!string.IsNullOrEmpty(GuidIDToken))
+        string? PaymentGUIDToken = "";
+        //check if the use does not have unfinshed payment 
+        if (await ExsistedCustomer.HasUnfinshedPayment())
+        {
+            //this is to make sure to prevent double payment  in any case 
+
+            Guid? UnfinshedPaymentGuid = await clsTransaction.GetUnfinshedPayment(ExsistedCustomer.UserID);
+            PaymentGUIDToken = clsGlobale.GenerateJwtToken(UnfinshedPaymentGuid.Value);
+        }
+        else
+        {
+            PaymentGUIDToken= clsGlobale.GenerateJwtToken(Guid.NewGuid());
+
+        }
+
+        if (!string.IsNullOrEmpty(AthorizationToken)&&!string.IsNullOrEmpty(PaymentGUIDToken))
         {
             Response.Cookies.Append("Authentication", AthorizationToken, cookieOptions);
-            Response.Cookies.Append("GuidID",GuidIDToken, cookieOptions);
+            Response.Cookies.Append("GuidID",PaymentGUIDToken, cookieOptions);
 
             return Ok(new DTOGeneralResponse("LogIn seccessfuly",200,"None"));
 

@@ -26,23 +26,40 @@ public class DTOPerson
 
     public string Phone { get; set; }
     public string Country { get; set; }
-    public string PostCode { get; set; }
+    public string PostCodeAndLocation { get; set; }
     public string  City { get; set; }
 
 
     public DTOPerson(int personID, string firstName, string lastName, string email, string phone, string Country,string City,string PostCode)
     {
-        PersonID = personID;
-        FirstName = firstName;
-        LastName = lastName;
-        Email = email;
-        Phone = phone;
+        this.PersonID = personID;
+        this.FirstName = firstName;
+        this.LastName = lastName;
+        this.Email = email;
+        this.Phone = phone;
         this.Country = Country;
         this.City = City;
-        this.PostCode = PostCode;
+        this.PostCodeAndLocation = PostCode;
+  
     }
+
+
+    public DTOPerson()
+    {
+        this.PersonID = -1;
+        this.FirstName = "";
+        this.LastName = "";
+        this.Email = "example@.com";
+        this.Phone = "";
+        this.Country = "";
+        this.City = "";
+        this.PostCodeAndLocation = "";
+
+    }
+
+
 }
- 
+
 
 namespace ConnectionLayer
 {
@@ -89,7 +106,7 @@ namespace ConnectionLayer
                                     Person.Phone = Reader["Phone"].ToString();
                                     Person.Country = Reader["Country"].ToString();
                                     Person.City = Reader["City"].ToString();
-                                    Person.PostCode = Reader["PostCode"].ToString();
+                                    Person.PostCodeAndLocation = Reader["PostCode"].ToString();
 
                                     return Person;
                                 }
@@ -204,7 +221,7 @@ namespace ConnectionLayer
                         command.Parameters.AddWithValue("@Phone", person.Phone);
                         command.Parameters.AddWithValue("@Country", person.Country); 
                         command.Parameters.AddWithValue("@City", person.City);
-                        command.Parameters.AddWithValue("@PostCode", person.PostCode);
+                        command.Parameters.AddWithValue("@PostCode", person.PostCodeAndLocation);
 
 
 
@@ -276,7 +293,7 @@ where PersonID=@PersonID";
                         command.Parameters.AddWithValue("@Phone", Person.Phone);
                         command.Parameters.AddWithValue("@Country", Person.Country);
                         command.Parameters.AddWithValue("@City", Person.City);
-                        command.Parameters.AddWithValue("@PostCode", Person.PostCode);
+                        command.Parameters.AddWithValue("@PostCode", Person.PostCodeAndLocation);
                         command.Parameters.AddWithValue("@PersonID", Person.PersonID);
 
 

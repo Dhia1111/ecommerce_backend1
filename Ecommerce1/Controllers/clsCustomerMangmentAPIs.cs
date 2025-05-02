@@ -9,7 +9,8 @@ using Stripe;
 using Ecommerce1;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Stripe.V2;
-
+using Microsoft.Extensions.Logging;
+using Stripe.Events;
 public class DTOPayment
 {
 
@@ -26,6 +27,12 @@ public class DTOPayment
 
 }
 
+public static class Events
+{
+    public const string PaymentIntentSucceeded = "payment_intent.succeeded";
+    public const string PaymentIntentPaymentFailed = "payment_intent.payment_failed";
+    // …etc
+}
 
 [Route("api/Ecommerce/CustomerMangment")]
 [ApiController]
@@ -121,7 +128,7 @@ public class clsCustomerMangmentAPIs : ControllerBase
     public async Task<ActionResult<object>> Payment([FromBody] DTOPayment PaymentInf)
 
     {
-   
+ 
         clsUser? User = null;
 
         Guid? GuidID = Guid.Empty;
@@ -142,7 +149,7 @@ public class clsCustomerMangmentAPIs : ControllerBase
 
         else if (string.IsNullOrEmpty(PaymentInf.PaymentMethodID))
         {
-            return BadRequest(new DTOGeneralResponse("null request :make sure to provied the  data", 400, "Athorization and  Validation Error"));
+            return BadRequest(new DTOGeneralResponse("null request,make sure to provied the  data", 400, "Athorization and  Validation Error"));
 
         }
 
@@ -154,7 +161,7 @@ public class clsCustomerMangmentAPIs : ControllerBase
             return BadRequest(new DTOGeneralResponse("unvalid data request :the Country Name is Uncorect", 400, "Validation Error"));
 
         }
-        if (!await clsValidation.ValidateLocationAsync(PaymentInf.PersonInf.PostCode, PaymentInf.PersonInf.City, CountryCoude))
+        if (!await clsValidation.ValidateLocationAsync(PaymentInf.PersonInf.PostCodeAndLocation, PaymentInf.PersonInf.City, CountryCoude))
         {
 
 
@@ -212,11 +219,18 @@ public class clsCustomerMangmentAPIs : ControllerBase
             {
                 clsTransaction? Transaction = await clsTransaction.Find(GuidID.Value);
 
-                if (Transaction != null)
+                if (Transaction != null&&Transaction.State==DTOTransaction.enState.Pending)
                 {
                     await clsGlobale.SendEmail(User, "the transaction is in process please wait", "Processing the transaction", false);
 
                      return BadRequest(new DTOGeneralResponse("the transaction is in process please wait", 400, "Validation Error"));
+
+                }
+                else if(Transaction!=null)
+                {
+                    await clsGlobale.SendEmail(User, "the transaction is in Complited  please LogIn Again", "Processing the transaction", false);
+
+                    return BadRequest(new DTOGeneralResponse($"the transaction is hans Complited with State {Transaction?.State.ToString()},please logIn again", 400, "none"));
 
                 }
 
@@ -233,7 +247,7 @@ public class clsCustomerMangmentAPIs : ControllerBase
 
         if (PaymentInf.PersonInf != null)
         {
-            User.Person.PostCode = PaymentInf.PersonInf.PostCode;
+            User.Person.PostCode = PaymentInf.PersonInf.PostCodeAndLocation;
             User.Person.FirstName = PaymentInf.PersonInf.FirstName;
             User.Person.LastName = PaymentInf.PersonInf.LastName;
             User.Person.City = PaymentInf.PersonInf.City;
@@ -249,10 +263,6 @@ public class clsCustomerMangmentAPIs : ControllerBase
 
         }
 
-
-
-
-        //Get TotolPrice
         decimal TotolePrice = 0;
 
         if (PaymentInf.InCludedProductList != null)
@@ -290,8 +300,7 @@ public class clsCustomerMangmentAPIs : ControllerBase
 
         string SecrtKey = clsGlobale.GetStripSecret();
 
-
-
+        PaymentIntent _PaymentIntent = new PaymentIntent();
         try
         {
             StripeConfiguration.ApiKey = SecrtKey;
@@ -301,29 +310,100 @@ public class clsCustomerMangmentAPIs : ControllerBase
                 Amount = (long)(TotolePrice * 100),
                 Currency = "usd",
                 PaymentMethod = PaymentInf.PaymentMethodID,
-                Confirm = true,
+                Confirm = false,
                 ReceiptEmail = User.Person.Email,
+                Description = "Purchase from MyStore",
+                Metadata = new Dictionary<string, string>
+            {
+                { "TransactionGUID", clsGlobale.GenerateJwtToken(NewTransaction.TransactionGUID) }
+            },
                 AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
                 {
+
                     Enabled = true,
-                    AllowRedirects = "never" // Disables redirect-based payments
+                    AllowRedirects = "always" // Disables redirect-based payments
+
+
+                }
+                ,
+                Shipping = new ChargeShippingOptions
+                {
+                    Name = User.UserName,
+                    Address = new Stripe.AddressOptions
+                    {
+
+
+                        Country = PaymentInf.PersonInf.Country,
+                        City = PaymentInf.PersonInf.City,
+                        PostalCode = clsLocation.ExtractPostCodeFromPostCodeAndLocation(PaymentInf.PersonInf.PostCodeAndLocation),
+
+                    }
+
+
                 }
 
-            };
-            var service = new PaymentIntentService();
-            await service.CreateAsync(option);
 
+
+
+            };
+            var requestOptions = new RequestOptions
+            {
+
+                StripeAccount = clsGlobale.GetStripCLIAcountNumber()
+            };
+
+
+            var service = new PaymentIntentService();
+        var  PaymentIntent=  await service.CreateAsync(option);
+
+            _PaymentIntent = PaymentIntent;
         }
 
         catch (StripeException ex)
         {
 
-            clsTransaction? PendingPaymentfailed = await clsTransaction.Find(Guid.Parse(NewTransaction.TransactionGUID.ToString()));
+
+            clsTransaction? PendingPaymentfailed = await clsTransaction.Find(NewTransaction.TransactionGUID);
 
             if (PendingPaymentfailed != null)
             {
                 PendingPaymentfailed.State = DTOTransaction.enState.Failed;
-                await PendingPaymentfailed.Save();
+            bool  Results  = await PendingPaymentfailed.Save();
+                var deleteOptions1 = new CookieOptions
+                {
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Path = "/" // Make sure to match the path
+                };
+
+                //delete old Cookies 
+
+                Response.Cookies.Delete("GuidID", deleteOptions1);
+                Response.Cookies.Delete("Authentication", deleteOptions1);
+
+                if (Results)
+                {
+                    var cookieOptions1 = new CookieOptions
+                    {
+                        HttpOnly = true,   // Prevent JavaScript access
+                        Secure = true,     // Only send over HTTPS
+                        SameSite = SameSiteMode.None, // Prevent CSRF attacks
+                        Expires = DateTime.UtcNow.AddHours(1) // Set expiration
+                    };
+                    //seting the Pending transaction Id to prevent fouble pay
+                    var GuidIDToken1 = clsGlobale.GenerateJwtToken(Guid.NewGuid());
+                    var AtherizationToken1 = clsGlobale.GenerateJwtToken(User.DTOUser);
+
+
+                    if (!string.IsNullOrEmpty(GuidIDToken1) && !string.IsNullOrEmpty(AtherizationToken1))
+                    {
+                        Response.Cookies.Append("GuidID", GuidIDToken1, cookieOptions1);
+                        Response.Cookies.Append("Authentication", AtherizationToken1, cookieOptions1);
+
+
+
+                    }
+                }
 
             }
 
@@ -345,6 +425,8 @@ public class clsCustomerMangmentAPIs : ControllerBase
 
         }
 
+
+
         var deleteOptions = new CookieOptions
         {
             Secure = true,
@@ -356,24 +438,30 @@ public class clsCustomerMangmentAPIs : ControllerBase
 
         //Finsh payment
 
-        clsTransaction? PendingPayment = await clsTransaction.Find(Guid.Parse(NewTransaction.TransactionGUID.ToString()));
+        // this will move to stripe hooks
 
-        if (PendingPayment != null)
-        {
-            PendingPayment.State = DTOTransaction.enState.Succeeded;
+        
+        /*  clsTransaction? PendingPayment = await clsTransaction.Find(Guid.Parse(NewTransaction.TransactionGUID.ToString()));
+
+          if (PendingPayment != null)
+          {
+              PendingPayment.State = DTOTransaction.enState.Succeeded;
 
 
-            await PendingPayment.Save();
+              await PendingPayment.Save();
 
 
-        }
+          }*/
+
+
         //delete old Cookies 
+        
         Response.Cookies.Delete("GuidID", deleteOptions);
         Response.Cookies.Delete("Authentication", deleteOptions);
 
 
-
         //Create a new Cookies
+
 
         var cookieOptions = new CookieOptions
         {
@@ -382,8 +470,8 @@ public class clsCustomerMangmentAPIs : ControllerBase
             SameSite = SameSiteMode.None, // Prevent CSRF attacks
             Expires = DateTime.UtcNow.AddHours(1) // Set expiration
         };
-
-        var GuidIDToken = clsGlobale.GenerateJwtToken(Guid.NewGuid());
+        //seting the Pending transaction Id to prevent fouble pay
+        var GuidIDToken = clsGlobale.GenerateJwtToken(NewTransaction.TransactionGUID);
         var AtherizationToken = clsGlobale.GenerateJwtToken(User.DTOUser);
 
 
@@ -398,9 +486,8 @@ public class clsCustomerMangmentAPIs : ControllerBase
 
         else
         {
-            await clsGlobale.SendEmail(User, "the Payment Completed secsessfuly but you need to log in again due to server error", "Processing the Payment", false);
-
-            return StatusCode(500, new DTOGeneralResponse("the Payment Completed secsessfuly but you need to log in again due to server error", 500, "Cookie Genrating error"));
+ 
+            return StatusCode(500, new DTOGeneralResponse("LogIn Again", 500, "Cookie Genrating error"));
 
 
         }
@@ -410,9 +497,12 @@ public class clsCustomerMangmentAPIs : ControllerBase
 
 
 
-        await clsGlobale.SendEmail(User, "the Payment Completed secsessfuly", "Processing the Payment", false);
+        await clsGlobale.SendEmail(User, "the Payment is Prosessing...", "Processing the Payment", false);
 
-        return Ok(new DTOGeneralResponse("Payment Complted secsessfuly", 200,"None"));
+        return Ok(new
+        {
+            clientSecret = _PaymentIntent.ClientSecret
+        });
 
 
 
@@ -420,8 +510,56 @@ public class clsCustomerMangmentAPIs : ControllerBase
     }
 
 
-    
-}
+
+
+  [HttpPost("handlingStripHooks")]
+    public async Task<IActionResult> HandleStripeHooks()
+        
+    {
+
+             // 1) Read the raw body
+            var json = await new StreamReader(Request.Body).ReadToEndAsync();
+            var stripeSignature = Request.Headers["Stripe-Signature"];
+
+            Stripe.Event stripeEvent;
+            try
+            {
+            // 2) Verify & construct the event
+            stripeEvent = EventUtility.ConstructEvent(
+                json,
+                stripeSignature,
+                clsGlobale.StripeWebhookSecret()
+            );
+            }
+            catch (StripeException e)
+            {
+            Console.WriteLine($"⚠️ Webhook signature verification failed: {e.Message}");
+
+            return BadRequest(); // signature verification failed
+
+            }
+
+            // 3) Handle the event type
+            switch (stripeEvent.Type)
+            {
+                case Events.PaymentIntentSucceeded:
+                    var pi = (PaymentIntent)stripeEvent.Data.Object;
+                    break;
+
+                case Events.PaymentIntentPaymentFailed:
+                    var failed = (PaymentIntent)stripeEvent.Data.Object;
+                    // → mark order Failed, notify user
+                    break;
+
+                    // handle more event types as needed...
+            }
+
+            // 4) Return 200 to acknowledge receipt
+            return Ok();
+        }
+    }
+
+
 
 
 

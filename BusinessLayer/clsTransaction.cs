@@ -124,6 +124,11 @@ namespace BusinessLayer
             return DTO != null ? new clsTransaction(DTO) : null;
         }
 
+
+        public static async Task <Guid?>GetUnfinshedPayment(int UserId)
+        {
+            return await  ConnectionLayer.clsTransaction.GetTransactionGuidIdFroUnfinshedPayment(UserId);
+        }
     
     
     }

@@ -38,6 +38,18 @@ public class DTOUser
         this.CreatedAt = CreatedAt;
         this.Person = new DTOPerson(-1, "", "", "", "", "", "", "");
     }
+    public DTOUser()
+    {
+        this.UserID = -1;
+        this.PersonID = -1;
+
+        this.UserRole = enRole.Customer;
+        this.UserName = "";
+        this.UserPassword = "";
+        this.UserAtherization = 0;
+        this.CreatedAt = DateTime.Now.ToString();
+        this.Person = new DTOPerson(-1, "", "", "", "", "", "", "");
+    }
 
 
 

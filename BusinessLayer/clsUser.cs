@@ -43,7 +43,7 @@ namespace BusinessLayer
             this.Role = User.UserRole;
             this.Atherization = User.UserAtherization;
             _Mode = enMode.Add;
-            _Person = new clsPerson(User.Person.FirstName, User.Person.LastName, User.Person.Email, User.Person.Phone, User.Person.Country, User.Person.City, User.Person.PostCode);
+            _Person = new clsPerson(User.Person.FirstName, User.Person.LastName, User.Person.Email, User.Person.Phone, User.Person.Country, User.Person.City, User.Person.PostCodeAndLocation);
         }
 
          clsUser(int ID, int PersonID, string UserName, string PassWord, byte Athorization , DTOUser.enRole Role,clsPerson Person)
@@ -97,6 +97,13 @@ namespace BusinessLayer
             return new clsUser(user.UserID, user.PersonID, user.UserName, user.UserPassword, user.UserAtherization, user.UserRole, person);
         }
 
+     
+        public  async Task<bool> HasUnfinshedPayment()
+        {
+            bool result= ((await ConnectionLayer.clsTransaction.GetTransactionGuidIdFroUnfinshedPayment(this.UserID)) != Guid.Empty);
+
+            return result;
+        }
         bool CleanCustomerAthorization()
         {
 

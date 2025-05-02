@@ -29,6 +29,7 @@ namespace Ecommerce1
         {
             return _configuration["JWT_SECRET"];
         }
+      
         public static string GetTheBestImageExtention()
         {
             return _configuration["BestImageExtension"];
@@ -38,6 +39,14 @@ namespace Ecommerce1
             return _configuration["stripeSecretKey"];
         }
 
+        public static string StripeWebhookSecret()
+        {
+            return _configuration["StripeWebHook"];
+        }
+        public static string GetStripCLIAcountNumber()
+        {
+            return _configuration["StripAccountCLI"];
+        }
         public static string SetImageURL(string ImageName)
         {
             return _configuration["ImagesUrl"].ToString() + ImageName;

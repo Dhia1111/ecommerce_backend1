@@ -6,6 +6,11 @@ namespace Ecommerce1
     {
         private static readonly HttpClient client = new HttpClient();
 
+        private static  IHttpClientFactory _httpClientFactory ;
+            public static void Insilaze(IHttpClientFactory If)
+        {
+            _httpClientFactory = If;
+        }
         static string _GetTextUntilTheFirstSeprater(string Text)
         {
             int Index = Text.IndexOf("//");
@@ -32,13 +37,13 @@ namespace Ecommerce1
 
         public static async Task<bool> ValidateLocationAsync(string postalCode, string city, string countryCode)
         {
+            var Myclient = _httpClientFactory.CreateClient("GeoClient");
             try
             {
                 string username = clsGlobale.GetgeonamesUserName();
                 string PlaceFromThePostCode = _GetTextAftertheSeprater(postalCode);
                 postalCode = _GetTextUntilTheFirstSeprater(postalCode);
-                var url = $"{clsGlobale.BaseGeoNameUrl()}?postalcode={postalCode}&placename={PlaceFromThePostCode}&country={countryCode}&username={username}";
-                var response = await client.GetAsync(url);
+                var response = await Myclient.GetAsync($"findNearbyPostalCodesJSON?postalcode={postalCode}&placename={PlaceFromThePostCode}&country={countryCode}&username={username}");
 
                 if (!response.IsSuccessStatusCode)
                     return false;

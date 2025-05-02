@@ -18,5 +18,19 @@ namespace BusinessLayer
         {
             return await ConnectionLayer.clsLocation.GetAllCountries();
         }
+
+        public static string ExtractPostCodeFromPostCodeAndLocation(string PostCodeAndLocation)
+        {
+            int Index = PostCodeAndLocation.IndexOf("//");
+
+
+
+            if (Index > 0) return PostCodeAndLocation.Substring(0, Index);
+            else
+            {
+                return PostCodeAndLocation;
+            }
+        }
+
     }
 }

@@ -11,8 +11,6 @@ using Ecommerce1;
 
 
 
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 string SecretKey = clsGlobale.GetJwtSecret();
@@ -106,7 +104,8 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+var factory = app.Services.GetRequiredService<IHttpClientFactory>();
+clsValidation.Insilaze(factory);
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
