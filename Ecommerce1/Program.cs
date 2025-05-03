@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using System.Net;
 using Microsoft.Extensions.FileProviders;
 using Ecommerce1;
+using Stripe;
 
 
 
@@ -33,6 +34,7 @@ builder.Services.AddHttpClient("GeoClient", client => {
         // For testing ONLY - remove in production
         ServerCertificateCustomValidationCallback = (msg, cert, chain, errors) => true
     });
+
 
 
 //builder.Services.AddAuthentication((option) =>
@@ -106,6 +108,8 @@ var app = builder.Build();
 
 var factory = app.Services.GetRequiredService<IHttpClientFactory>();
 clsValidation.Insilaze(factory);
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

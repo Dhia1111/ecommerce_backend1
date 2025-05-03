@@ -27,12 +27,7 @@ public class DTOPayment
 
 }
 
-public static class Events
-{
-    public const string PaymentIntentSucceeded = "payment_intent.succeeded";
-    public const string PaymentIntentPaymentFailed = "payment_intent.payment_failed";
-    // …etc
-}
+
 
 [Route("api/Ecommerce/CustomerMangment")]
 [ApiController]
@@ -512,52 +507,8 @@ public class clsCustomerMangmentAPIs : ControllerBase
 
 
 
-  [HttpPost("handlingStripHooks")]
-    public async Task<IActionResult> HandleStripeHooks()
-        
-    {
 
-             // 1) Read the raw body
-            var json = await new StreamReader(Request.Body).ReadToEndAsync();
-            var stripeSignature = Request.Headers["Stripe-Signature"];
-
-            Stripe.Event stripeEvent;
-            try
-            {
-            // 2) Verify & construct the event
-            stripeEvent = EventUtility.ConstructEvent(
-                json,
-                stripeSignature,
-                clsGlobale.StripeWebhookSecret()
-            );
-            }
-            catch (StripeException e)
-            {
-            Console.WriteLine($"⚠️ Webhook signature verification failed: {e.Message}");
-
-            return BadRequest(); // signature verification failed
-
-            }
-
-            // 3) Handle the event type
-            switch (stripeEvent.Type)
-            {
-                case Events.PaymentIntentSucceeded:
-                    var pi = (PaymentIntent)stripeEvent.Data.Object;
-                    break;
-
-                case Events.PaymentIntentPaymentFailed:
-                    var failed = (PaymentIntent)stripeEvent.Data.Object;
-                    // → mark order Failed, notify user
-                    break;
-
-                    // handle more event types as needed...
-            }
-
-            // 4) Return 200 to acknowledge receipt
-            return Ok();
-        }
-    }
+}
 
 
 
