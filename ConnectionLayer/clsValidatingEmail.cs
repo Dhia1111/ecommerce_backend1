@@ -202,7 +202,7 @@ namespace ConnectionLayer
  
  
         }
-        public static async Task<bool> Delete(int PersonID)
+        public static async Task<bool> DeleteUnvalidation(int PersonID)
         {
 
             string qery = @"Delete from  ValidatingEmail  where PersonID=@PersonID";
@@ -220,12 +220,7 @@ namespace ConnectionLayer
 
                         int NumberRowAffected = await command.ExecuteNonQueryAsync();
 
-                        if (NumberRowAffected == 0)
-                        {
-
-                            return false;
-
-                        }
+                        return NumberRowAffected!=0;
 
 
                     }
@@ -243,7 +238,6 @@ namespace ConnectionLayer
 
 
 
-            return true;
 
         }
         public static async Task<bool> Delete(string GUID_ID)

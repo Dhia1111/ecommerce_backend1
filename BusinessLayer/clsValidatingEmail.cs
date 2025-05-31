@@ -30,7 +30,7 @@ namespace BusinessLayer
    
         public static async Task<bool> Delete(int PersonID)
         {
-            return await ConnectionLayer.clsValidatingEmail.Delete(PersonID);
+            return await ConnectionLayer.clsValidatingEmail.DeleteUnvalidation(PersonID);
 
         }
 

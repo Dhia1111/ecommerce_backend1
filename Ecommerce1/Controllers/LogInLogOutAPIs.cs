@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 namespace Ecommerce1.Controllers;
 
-using BusinessLayer;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 using System.Net.Mail;
@@ -406,30 +404,33 @@ public class EcommerceController : ControllerBase
     }
 
 
-    [HttpPost("verify-email")]
+
+
+    [HttpPost("VERIFYEMAIL", Name = "VERIFYEMAIL")]
+
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> VerifyEmail([FromBody] string GUID_ID)
+    public async Task<ActionResult<DTOGeneralResponse>> VerifyEmail([FromBody] string GUID_ID)
     {
         clsValidatingEmail? validatingEmail = await clsValidatingEmail.Find(GUID_ID);
 
         if (validatingEmail == null)
         {
 
-            return BadRequest(new DTOGeneralResponse("Pleas Check if your account is active or  Sign up again ",400,"Serch faileur"));
+            return BadRequest(new DTOGeneralResponse("Pleas Check if your account is active or  Sign up again ", 400, "Serch faileur"));
 
         }
 
-          clsUser? User = await clsUser.FindByPersonID(validatingEmail.PersonID);
+        clsUser? User = await clsUser.FindByPersonID(validatingEmail.PersonID);
 
-          if (User == null) { return StatusCode(500, new DTOGeneralResponse("Un internale server error", 500, "Serch faileur")); }
+        if (User == null) { return StatusCode(500, new DTOGeneralResponse("Un internale server error", 500, "Serch faileur")); }
 
         bool result = await clsValidatingEmail.Delete(validatingEmail.PersonID);
 
         if (!result)
         {
-            return StatusCode(500,new DTOGeneralResponse( "Unable to Acive the account and confirme the email",500,"Deleting data Faileur"));
+            return StatusCode(500, new DTOGeneralResponse("Unable to Acive the account and confirme the email", 500, "Deleting data Faileur"));
         }
 
         var cookieOptions = new CookieOptions
@@ -442,24 +443,21 @@ public class EcommerceController : ControllerBase
 
         string? AuthenticationToken = clsGlobale.GenerateJwtToken(User.DTOUser);
         string? GuidIdToken = clsGlobale.GenerateJwtToken(Guid.NewGuid());
-        if (!string.IsNullOrEmpty(AuthenticationToken)&&!string.IsNullOrEmpty(GuidIdToken))
+        if (!string.IsNullOrEmpty(AuthenticationToken) && !string.IsNullOrEmpty(GuidIdToken))
         {
             Response.Cookies.Append("Authentication", AuthenticationToken, cookieOptions);
             Response.Cookies.Append("GuidID", GuidIdToken, cookieOptions);
 
-            return Ok("Email verfied seccessfuly");
+            return Ok(new DTOGeneralResponse("Email Verfied secsessfuly", 200, "none"));
 
         }
 
         else
         {
-            return StatusCode(500,new DTOGeneralResponse("An unexpected server error accurred.",500,"Creating JWT faileur"));
+            return StatusCode(500, new DTOGeneralResponse("An unexpected server error accurred.", 500, "Creating JWT faileur"));
 
         }
     }
-
-
-  
 
 
 

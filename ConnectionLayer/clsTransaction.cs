@@ -423,8 +423,6 @@ where TransactionID=@TransactionID";
             return true;
 
         }
-
-
         public static  async Task<Guid> GetTransactionGuidIdFroUnfinshedPayment(int UserID)
 
         {
